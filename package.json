@@ -7,5 +7,11 @@
     "handlebars": "^4.0.6",
     "showdown": "^1.6.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.15.2"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "start": "node build.js && node server.js"
+  }
 }
