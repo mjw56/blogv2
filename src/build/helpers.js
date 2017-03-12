@@ -4,10 +4,7 @@ const handlebars = require('handlebars');
 const showdown = require('showdown');
 const converter = new showdown.Converter();
 
-// keep a record of all the blog posts and their titles
-// we're going to populate them as links into the index.html page
-let index = [];
-
+// creates a directory
 function mkdirSync(path) {
   try {
     fs.mkdirSync(path);
@@ -18,6 +15,7 @@ function mkdirSync(path) {
   }
 }
 
+// removes a directory path completely
 function clearDirSync(dirPath) {
   try { var files = fs.readdirSync(dirPath); }
   catch(e) { return; }
@@ -33,6 +31,7 @@ function clearDirSync(dirPath) {
   fs.rmdirSync(dirPath);
 };
 
+// copy files from one location to another
 function copyFileSync(source, target, cb) {
   var cbCalled = false;
 
@@ -50,13 +49,14 @@ function copyFileSync(source, target, cb) {
   rd.pipe(wr);
 
   function done(err) {
-    if (!cbCalled) {
+    if (!cbCalled && typeof cb === 'function') {
       cb(err);
       cbCalled = true;
     }
   }
 }
 
+// read all files in a given directory
 function readFiles(dirname, onFileContent, onError) {
   fs.readdir(dirname, function(err, filenames) {
     if (err) {
@@ -64,31 +64,45 @@ function readFiles(dirname, onFileContent, onError) {
       return;
     }
 
-    onFileContent(filenames);
+    if (typeof onFileContent === 'function') {
+      onFileContent(filenames);
+    }
   });
 }
 
-function getDirectories (srcpath) {
+// get list of directories in folder
+function getDirectories(srcpath) {
   return fs.readdirSync(srcpath)
     .filter(file => fs.statSync(path.join(srcpath, file)).isDirectory())
 }
 
+// check if a file exists
 function fileExists(path) {
   return fs.existsSync(path);
 }
 
+// TODO: think of better way to pass in this index
+// this file represents the list of blog posts on the
+// landing index page of the blog
+let index = [];
+
+// get the index
+function getIndex() {
+  return index;
+}
+
 // handle each file in a post directory
 function handlePostDir(dirname, onError) {
-  const base = fs.readFileSync('posts/_base.html', 'utf8');
+  const base = fs.readFileSync('./src/posts/_base.html', 'utf8');
 
   // check if we have an index.md, if we don't return
-  if (!fileExists(`posts/${dirname}/index.md`)) {
+  if (!fileExists(`./src/posts/${dirname}/index.md`)) {
     console.log(`index.md file not found for ${dirname}`);
     return;
   }
 
   // check if we have a config.json, if we don't return
-  if (!fileExists(`posts/${dirname}/config.json`)) {
+  if (!fileExists(`./src/posts/${dirname}/config.json`)) {
     console.log(`config.json file not found for ${dirname}`);
     return;
   }
@@ -97,7 +111,7 @@ function handlePostDir(dirname, onError) {
   mkdirSync(`public/${dirname}`);
 
   // setup the index.md file
-  fs.readFile(`posts/${dirname}/index.md`, 'utf-8', function(err, content) {
+  fs.readFile(`./src/posts/${dirname}/index.md`, 'utf-8', function(err, content) {
     if (err) {
       onError(err);
       return;
@@ -119,41 +133,35 @@ function handlePostDir(dirname, onError) {
     });
   });
 
+  // copy all the remainder of the files excluding the index.md or config.json
+  readFiles(
+    `./src/posts/${dirname}/`, 
+    (files) => {
+      files.forEach((file) => {
+        if (file !== 'index.md' && file !== 'config.json') {
+          copyFileSync(
+            `./src/posts/${dirname}/${file}`,
+            `public/${dirname}/${file}`,
+            () => { console.log(`public/${dirname}/${file} copied!`) }
+          );
+        }
+      })
+    },
+    (err) => {
+      console.warn(err);
+    }
+  );
+
   // read the config and store the title and link
-  const config = JSON.parse(fs.readFileSync(`posts/${dirname}/config.json`, 'utf8'));
+  const config = JSON.parse(fs.readFileSync(`./src/posts/${dirname}/config.json`, 'utf8'));
   index.push({ title: config.title, route: dirname });
 }
 
-// wipe out old public
-clearDirSync('public');
-
-// start fresh public
-mkdirSync('public');
-
-// get all post directories
-const dirs = getDirectories('./posts');
-
-// for each directory, go in and read the files
-dirs.forEach((dir) => {
-  // we should probably have a config.json for each post this just makes it easier
-  // wthout having an automated backend right now, i dunno, need to come back to this
-  // sometime later though and figure it out
-  handlePostDir(dir, (err) => { console.log(err) });
-});
-
-// read in base index and populate
-const indexBase = fs.readFileSync('_index.html', 'utf8');
-const context = {
-  posts: index
-};
-const template = handlebars.compile(indexBase);
-const html = template(context);
-
-// write the result to public
-fs.writeFile(`public/index.html`, html, function(err) {
-    if(err) {
-        return console.log(err);
-    }
-
-    console.log(`index.html was saved!`);
-});
+module.exports = {
+  mkdirSync: mkdirSync,
+  clearDirSync: clearDirSync,
+  copyFileSync: copyFileSync,
+  getDirectories: getDirectories,
+  handlePostDir: handlePostDir,
+  getIndex: getIndex
+}
