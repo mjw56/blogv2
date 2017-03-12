@@ -1,0 +1,10 @@
+<html>
+  <body>
+    <h1>index</h1>
+    <ul class="posts">
+      {{#each posts}}
+        <li><a href="{{this.route}}">{{this.title}}</a></li>
+      {{/each}}
+    </ul>
+  </body>
+</html>
