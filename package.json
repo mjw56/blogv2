@@ -5,6 +5,8 @@
   "license": "MIT",
   "devDependencies": {
     "handlebars": "^4.0.6",
+    "node-watch": "^0.5.1",
+    "opn": "^4.0.2",
     "showdown": "^1.6.4"
   },
   "dependencies": {
@@ -12,7 +14,7 @@
   },
   "scripts": {
     "build": "node src/build",
-    "develop": "node src/build && node server.js",
+    "develop": "npm run build && npm run start",
     "start": "node server.js"
   }
 }
