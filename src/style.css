@@ -8,16 +8,135 @@ body {
   margin: 30px;
 }
 
+.home h1 {
+  color: rgba(0, 0, 0, 0.8);
+  text-align: center;
+  font-family: medium-content-sans-serif-font,"Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Arial,sans-serif;
+  font-weight: bold;
+  font-size: 40px;
+}
+
+code {
+  border-radius: 5px;
+  font-size: 20px;
+}
+
+.posts {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  justify-content: center;
+  padding: 0;
+}
+
 .posts li {
+  flex-shrink: 0;
+  padding: 15px;
   list-style: none;
+  height: 300px;
+  width: 400px;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: white;
+  color: rgba(0, 0, 0, 0.8);
+  font-family: medium-content-sans-serif-font,"Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Arial,sans-serif;
+}
+
+.posts li:hover {
+  cursor: pointer;
+  opacity: 0.70;
+}
+
+.posts li a {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.8);
+  text-align: center;
+  width: 100%;
+  display: block;
+  font-weight: bold;
+}
+
+.posts li img {
+    display: block;
+    max-width: 330px;
+    max-height: 600px;
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+
+.home-link {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 21px;
+  line-height: 33px;
+  font-weight: bolder;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.home-link:hover {
+  opacity: 0.60;
+}
+
+.post {
+  margin: 0 auto;
+  max-width: 900px;
+}
+
+.post p {
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 21px;
+  line-height: 33px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 .post h1 {
-  color: mediumseagreen;
+  color: rgba(0, 0, 0, 0.8);
+  text-align: center;
+  font-family: medium-content-sans-serif-font,"Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Arial,sans-serif;
+  font-weight: bold;
+  font-size: 40px;
 }
 
 .post img {
-  width: 100%;
+  max-width: 50%; 
+  display:block; 
+  height: auto;
+  margin: 0 auto;
+  border-radius: 3px;
+}
+
+@media (max-width: 600px) {
+  .home h1, .post h1 {
+    font-size: 30px;
+  }
+
+  code {
+    font-size: 16px;
+  }
+
+  .post p {
+    font-size: 16px;
+    line-height: 28px;
+  }
+}
+
+@media (max-width: 900px) {
+  .posts li {
+    height: 170px;
+    width: 200px;
+  }
+
+  .posts li img {
+    max-width: 180px;
+    max-height: 150px;
+  }
+
+  .post {
+    margin: 0 5%;
+  }
 }
 
 .footer {
