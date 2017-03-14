@@ -36,5 +36,7 @@ fs.writeFile(`public/index.html`, html, function(err) {
     console.log(`index.html was saved!`);
 });
 
-// copy over styles
+// copy over styles and highlighting stuff
 helpers.copyFileSync('./src/style.css', 'public/style.css');
+helpers.copyFileSync('./src/highlight.pack.js', 'public/highlight.pack.js');
+helpers.copyFileSync('./src/tomorrow-night-eighties.css', 'public/tomorrow-night-eighties.css');
