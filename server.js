@@ -20,6 +20,12 @@ server.listen(3000, () => {
 
 watch('./src', { recursive: true }, function(evt, name) {
   exec('yarn run build', function callback(error, stdout, stderr){
+    if (error) {
+        console.log(error);
+        return;
+    }
+    
+    console.log(stdout);
     openBrowser('http://localhost:3000');
   });
 });
