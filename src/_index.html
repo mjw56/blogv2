@@ -3,17 +3,21 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <div class="container">
-      <h1>index</h1>
+    <div class="home container">
       <ul class="posts">
         {{#each posts}}
-          <li><a href="{{this.route}}">{{this.title}}</a></li>
+          <li onclick="goTo('{{this.route}}')">
+            <a href="{{this.route}}">{{this.title}}</a>
+            <img src="{{this.route}}/cover.jpg" />
+          </li>
         {{/each}}
       </ul>
     </div>
-    <div class="footer">
-      
-    </div>
+    <script>
+      const goTo = function(route) {
+        window.location = `${window.location.href}/${route}`;
+      }
+    </script>
   </body>
 </html>
 
