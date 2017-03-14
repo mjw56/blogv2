@@ -1,16 +1,26 @@
 <html>
   <head>
+    <link rel="stylesheet" href="../tomorrow-night-eighties.css">
     <link rel="stylesheet" href="../style.css">
   </head>
   <body>
     <div class="container">
+      <a class="home-link" href="/">< Home</a>
       <div class="post">
-        <a class="home-link" href="/">< Home</a>
         {{{body}}}
       </div>
     </div>
-    <div class="footer">
+  
+    <script src="../highlight.pack.js"></script>
 
-    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function(event) {
+        const codes = document.getElementsByTagName('code');
+
+        for (var node of codes) {
+          hljs.highlightBlock(node);
+        }
+      });
+    </script>
   </body>
 </html>
