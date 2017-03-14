@@ -1,10 +1,10 @@
-# First Post Title
+# Post One
 
-This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text 
+![cover](cover.jpg)
 
-![cover](cover.png)
+This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text This is some paragraph text
 
-Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text
+Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text Second paragraph text
 
 ```javascript
 var foo = 'bar';
