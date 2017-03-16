@@ -9,12 +9,10 @@ self.addEventListener('install', e => {
     caches.open(cacheName).then(cache => {
       return cache.addAll([
         '/',
-        /*
-          DEAR READER,
-          ADD A LIST OF YOUR ASSETS THAT
-          YOU WANT TO WORK WHEN OFFLINE
-          TO THIS ARRAY OF URLS
-        */
+        'index.html',
+        'style.css',
+        'highlight.pack.js',
+        'tomorrow-night-eighties.css'
       ]).then(() => self.skipWaiting());
     })
   );
