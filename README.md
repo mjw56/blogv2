@@ -13,7 +13,7 @@ Now, the `config.json` should be comprised like so: `{ "title": "Title of the Po
 
 Next, the user should include an `index.md` which is the content that will become the blog post. Here is an example of what a blog post could look like:
 
-```
+`
 # Post One
 
 ![cover](cover.jpg)
@@ -29,8 +29,7 @@ function baz() {
   console.log('test');
 }
 ```
-
-```
+`
 
 As you can see, this is normal markdown and there is nothing fancy going on here. The build step will take this content and feed it through the markdown converter tool which will gernerate the actual HTML. This is nice if you prefer writing just markdown and not having to worry about the HTML or anything. That was the main driving force behind why I created this. The generated HTML follows a similar structure and it has corresponding classes and such which can be themed. So, if you want something simple that you can use markdown for, this might be your tool!
 
