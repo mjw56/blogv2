@@ -36,8 +36,19 @@ fs.writeFile(`public/index.html`, html, function(err) {
     console.log(`index.html was saved!`);
 });
 
+// read all the files in from src dir and only copy what we need
+
+const srcFiles = helpers.readFiles('./src', function(files) {
+  files.filter(function(file) {
+    return file.substr(-3) === '.js' || file.substr(-4) === '.css'
+  })
+  .forEach(function(file) {
+	helpers.copyFileSync(`./src/${file}`, `public/${file}`);
+  });
+});
+
 // copy over styles and highlighting stuff
-helpers.copyFileSync('./src/style.css', 'public/style.css');
-helpers.copyFileSync('./src/sw.js', 'public/sw.js');
-helpers.copyFileSync('./src/highlight.pack.js', 'public/highlight.pack.js');
-helpers.copyFileSync('./src/tomorrow-night-eighties.css', 'public/tomorrow-night-eighties.css');
+// helpers.copyFileSync('./src/style.css', 'public/style.css');
+// helpers.copyFileSync('./src/sw.js', 'public/sw.js');
+// helpers.copyFileSync('./src/highlight.pack.js', 'public/highlight.pack.js');
+// helpers.copyFileSync('./src/tomorrow-night-eighties.css', 'public/tomorrow-night-eighties.css');

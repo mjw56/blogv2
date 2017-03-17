@@ -60,7 +60,9 @@ function copyFileSync(source, target, cb) {
 function readFiles(dirname, onFileContent, onError) {
   fs.readdir(dirname, function(err, filenames) {
     if (err) {
-      onError(err);
+	  if (typeof onError === 'function') {
+        onError(err);
+	  }
       return;
     }
 
@@ -164,6 +166,7 @@ module.exports = {
   mkdirSync: mkdirSync,
   clearDirSync: clearDirSync,
   copyFileSync: copyFileSync,
+  readFiles: readFiles,
   getDirectories: getDirectories,
   handlePostDir: handlePostDir,
   getIndex: getIndex
