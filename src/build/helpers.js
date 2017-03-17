@@ -107,6 +107,9 @@ function handlePostDir(dirname, onError) {
     return;
   }
 
+  // grab the post config
+  const config = JSON.parse(fs.readFileSync(`./src/posts/${dirname}/config.json`, 'utf8'));
+
   // create the public folder for this post
   mkdirSync(`public/${dirname}`);
 
@@ -118,7 +121,8 @@ function handlePostDir(dirname, onError) {
     }
 
     const context = {
-      body: converter.makeHtml(content)
+      body: converter.makeHtml(content),
+	  title: config.title
     };
 
     const template = handlebars.compile(base);
@@ -153,7 +157,6 @@ function handlePostDir(dirname, onError) {
   );
 
   // read the config and store the title and link
-  const config = JSON.parse(fs.readFileSync(`./src/posts/${dirname}/config.json`, 'utf8'));
   index.push({ title: config.title, route: dirname });
 }
 
