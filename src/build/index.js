@@ -1,6 +1,21 @@
 const fs = require('fs');
 const handlebars = require('handlebars');
+const database = require('../database');
 const helpers = require('./helpers');
+
+function copyFiles(cb) {
+  // read all the files in from src dir and only copy what we need
+  const srcFiles = helpers.readFiles('./src', function(files) {
+    files.filter(function(file) {
+      return file.substr(-3) === '.js' || file.substr(-4) === '.css'
+    })
+    .forEach(function(file) {
+      helpers.copyFileSync(`./src/${file}`, `public/${file}`);
+    });
+
+    cb();
+  });
+}
 
 // wipe out old public
 helpers.clearDirSync('public');
@@ -8,41 +23,54 @@ helpers.clearDirSync('public');
 // start fresh public
 helpers.mkdirSync('public');
 
-// get all post directories
-const dirs = helpers.getDirectories('./src/posts');
+// connect to mongo and get the list of all posts
+database.getPosts(function(posts) {
+  // console.log('got em', posts);
 
-// for each directory, go in and read the files
-dirs.forEach((dir) => {
-  // we should probably have a config.json for each post this just makes it easier
-  // wthout having an automated backend right now, i dunno, need to come back to this
-  // sometime later though and figure it out
-  helpers.handlePostDir(dir, (err) => { console.log(err) });
-});
+  // we are going to 
+  let routes = [];
 
-// read in base index and populate
-const indexBase = fs.readFileSync('./src/_index.html', 'utf8');
-const context = {
-  posts: helpers.getIndex()
-};
-const template = handlebars.compile(indexBase);
-const html = template(context);
+  for (const post of posts) {
+    // for each post we need to grab the content
+    // and build the template, then copy it over to
+    // the directory it will live under in the public/
+    const route = { 
+      content: post.deets.content,
+      cover: post.deets.cover,
+      route: post.timestamp,
+      title: post.deets.title 
+    };
 
-// write the result to public
-fs.writeFile(`public/index.html`, html, function(err) {
-    if(err) {
-        return console.log(err);
-    }
+    routes.push(route);
 
-    console.log(`index.html was saved!`);
-});
+    const onSuccess = function(msg) {
+      console.log(msg);
+    };
 
-// read all the files in from src dir and only copy what we need
-const srcFiles = helpers.readFiles('./src', function(files) {
-  files.filter(function(file) {
-    return file.substr(-3) === '.js' || file.substr(-4) === '.css'
-  })
-  .forEach(function(file) {
-	helpers.copyFileSync(`./src/${file}`, `public/${file}`);
+    const onFailure = function(msg) {
+      console.log(msg);
+    };
+
+    helpers.writePostFile(route, onSuccess, onFailure);
+  }
+
+  const indexBase = fs.readFileSync('./src/_index.html', 'utf8');
+  const context = {
+    posts: routes
+  };
+
+  const template = handlebars.compile(indexBase);
+  const html = template(context);
+
+  // write the result to public
+  fs.writeFile(`public/index.html`, html, function(err) {
+      if(err) {
+          return console.log(err);
+      }
+
+      console.log(`index.html was saved!`);
+      copyFiles(function() {
+        process.exit();
+      });
   });
 });
-

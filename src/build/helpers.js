@@ -93,73 +93,26 @@ function getIndex() {
   return index;
 }
 
-// handle each file in a post directory
-function handlePostDir(dirname, onError) {
-  const base = fs.readFileSync('./src/posts/_base.html', 'utf8');
-
-  // check if we have an index.md, if we don't return
-  if (!fileExists(`./src/posts/${dirname}/index.md`)) {
-    console.log(`index.md file not found for ${dirname}`);
-    return;
-  }
-
-  // check if we have a config.json, if we don't return
-  if (!fileExists(`./src/posts/${dirname}/config.json`)) {
-    console.log(`config.json file not found for ${dirname}`);
-    return;
-  }
-
-  // grab the post config
-  const config = JSON.parse(fs.readFileSync(`./src/posts/${dirname}/config.json`, 'utf8'));
-
-  // create the public folder for this post
-  mkdirSync(`public/${dirname}`);
-
-  // setup the index.md file
-  fs.readFile(`./src/posts/${dirname}/index.md`, 'utf-8', function(err, content) {
-    if (err) {
-      onError(err);
-      return;
-    }
+function writePostFile(data, onSuccess, onFailure) {
+    const base = fs.readFileSync('./src/posts/_base.html', 'utf8');
 
     const context = {
-      body: converter.makeHtml(content),
-	  title: config.title
+      body: converter.makeHtml(data.content),
+	    title: data.title
     };
 
     const template = handlebars.compile(base);
     const html = template(context);
 
-    fs.writeFile(`public/${dirname}/index.html`, html, function(err) {
+    mkdirSync(`public/${data.route}`);
+
+    fs.writeFile(`public/${data.route}/index.html`, html, function(err) {
         if(err) {
-            return console.log(err);
+            return onFailure(err);
         }
 
-        console.log(`${dirname}/index.html was saved!`);
+        return onSuccess(`${data.route}/index.html was saved!`);
     });
-  });
-
-  // copy all the remainder of the files excluding the index.md or config.json
-  readFiles(
-    `./src/posts/${dirname}/`, 
-    (files) => {
-      files.forEach((file) => {
-        if (file !== 'index.md' && file !== 'config.json') {
-          copyFileSync(
-            `./src/posts/${dirname}/${file}`,
-            `public/${dirname}/${file}`,
-            () => { console.log(`public/${dirname}/${file} copied!`) }
-          );
-        }
-      })
-    },
-    (err) => {
-      console.warn(err);
-    }
-  );
-
-  // read the config and store the title and link
-  index.push({ title: config.title, route: dirname });
 }
 
 module.exports = {
@@ -168,6 +121,6 @@ module.exports = {
   copyFileSync: copyFileSync,
   readFiles: readFiles,
   getDirectories: getDirectories,
-  handlePostDir: handlePostDir,
-  getIndex: getIndex
+  getIndex: getIndex,
+  writePostFile: writePostFile
 }

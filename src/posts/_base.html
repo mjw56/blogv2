@@ -8,9 +8,9 @@
       <a class="home-link" href="/">< Home</a>
       <div class="post">
         {{{body}}}
-		<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{title}}" data-size="large">
-			Tweet
-		</a>
+		  <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{title}}" data-size="large">
+			  Tweet
+		  </a>
       </div>
     </div>
   
@@ -28,8 +28,10 @@
 
 	<script>
 	  window.twttr = (function(d, s, id) {
-	    var js, fjs = d.getElementsByTagName(s)[0],
-	        t = window.twttr || {};
+	    var js;
+	    var t = window.twttr || {};
+      var fjs = d.getElementsByTagName(s)[0];
+    
 	    if (d.getElementById(id)) return t;
 	    js = d.createElement(s);
 	    js.id = id;
@@ -40,6 +42,8 @@
 	    t.ready = function(f) {
 	      t._e.push(f);
 	    };
+
+      fjs = null;
 
 	    return t;
 	  }(document, "script", "twitter-wjs"));
