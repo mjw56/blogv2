@@ -1757,6 +1757,11 @@ background: #fffbcc !important;
 	text-align: left;
 }
 
+.form-panel #file-preview {
+    height: 100px;
+    margin-top: 10px;
+}
+
 label {
 	font-weight: 400;
 }

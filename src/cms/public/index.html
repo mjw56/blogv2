@@ -7,7 +7,7 @@
     <meta name="author" content="Dashboard">
     <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
 
-    <title>DASHGUM - FREE Bootstrap Admin Template</title>
+    <title>Home</title>
 
     <!-- Bootstrap core CSS -->
     <link href="assets/css/bootstrap.css" rel="stylesheet">
@@ -42,7 +42,7 @@
                 <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
             </div>
         <!--logo start-->
-        <a href="index.html" class="logo"><b>DASHGUM</b></a>
+        <a href="index.html" class="logo"><b>HOME</b></a>
         <!--logo end-->
         <div class="nav notify-row" id="top_menu">
             <!--  notification start -->
@@ -99,7 +99,7 @@
                   </div>
                   <div class="col-lg-9 hide-panel" id="new-post">
                     <div class="form-panel">
-                  	  <h4 class="mb"><i class="fa fa-angle-right"></i> Form Elements</h4>
+                  	  <h4 class="mb"><i class="fa fa-angle-right"></i> New Post</h4>
                       <form action="javascript:submit();" class="form-horizontal style-form" enctype="multipart/form-data" id="post-form">
                           <div class="form-group">
                               <label class="col-sm-2 col-sm-2 control-label">Title</label>
@@ -116,7 +116,8 @@
                           <div class="form-group">
                               <label class="col-sm-2 col-sm-2 control-label">Cover Photo</label>
                               <div class="col-sm-10">
-                                  <input type="file" class="form-control" name="file" id="file" />
+                                  <input type="file" class="form-control" name="file" id="file" onchange="previewFile()" />
+                                  <img src="" alt="Image preview..." id="file-preview" name="file-preview">
                               </div>
                           </div>
                           <button type="submit" class="btn btn-theme" id="submit-btn">Submit</button>
@@ -194,8 +195,14 @@
 
     <script>
         let selectedRoute = 'index';
+        let newPostId;
+        let coverPhoto;
 
         function setPanel(route) {
+            if (route === 'new-post') {
+                newPostId = Date.now();
+            }
+
             document.getElementById(selectedRoute).classList.remove('show-panel');
             document.getElementById(selectedRoute).classList.add('hide-panel');
             document.getElementById(route).classList.remove('hide-panel');
@@ -240,6 +247,56 @@
     </script>
 
     <script>
+        // this calls s3 to upload the file with the signed request
+        function uploadFile(file, signedRequest, url){
+            const xhr = new XMLHttpRequest();
+            xhr.open('PUT', signedRequest);
+            xhr.onreadystatechange = () => {
+                if(xhr.readyState === 4){
+                    if(xhr.status === 200) {
+                        console.log('file uploaded!');
+                        coverPhoto = url;
+                    }
+                    else{
+                        alert('Could not upload file.');
+                    }
+                }
+            };
+            xhr.send(file);
+        }
+
+      // get signed s3 request from server
+      function signS3(file) {
+        fetch(`/sign-s3?file-name=${file.name}&file-type=${file.type}`)
+            .then(res => res.json())
+            .then(res => {
+                uploadFile(file, res.signedRequest, res.url);
+            });
+      }
+
+      // this will populate the image preview dialog
+      // after user has selected a file to upload
+      function previewFile() {
+        var preview = document.getElementById('file-preview');
+        var file    = document.getElementById('file').files[0];
+        var reader  = new FileReader();
+
+        if (!file) {
+            console.log('no file selected');
+            return;
+        }
+
+        reader.addEventListener("load", function () {
+            preview.src = reader.result;
+        }, false);
+
+        if (file) {
+            reader.readAsDataURL(file);
+
+            signS3(file);
+        }
+      }
+
       function getPosts() {
         fetch('/get-posts')
             .then(res => res.json())
@@ -250,53 +307,40 @@
       }
 
       function submit() {
-        var form = new FormData(document.getElementById('post-form'));
-
-        var input = document.querySelector('input[type="file"]')
-
-        var data = new FormData();
-        var reader = new FileReader();
-
-        const file = input.files[0];
-
         var myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/x-www-form-urlencoded');
-        // myHeaders.append('Content-Length', body.file.size);
+        myHeaders.append('Content-Type', 'application/json');
 
-        reader.onload = function( e ) {
+        const data = {
+            'title': document.getElementById('title').value,
+            'content': document.getElementById('content').value,
+            'cover': coverPhoto
+        };
 
-            var data = new FormData();
-            data.append('file', e.currentTarget.result);
-            data.append('test', 'foo');
+        fetch('/save-post', {
+            method: "POST",
+            headers: myHeaders,
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res) {
+                // fetch new list
+                getPosts();
 
-            fetch('/save-post', {
-                method: "POST",
-                headers: myHeaders,
-                body: data
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res) {
-                    // fetch new list
-                    getPosts();
+                // reset UI state
+                document.getElementById('submit-btn').classList.remove('btn-theme');
+                document.getElementById('submit-btn').classList.add('btn-success');
 
-                    // reset UI state
-                    document.getElementById('submit-btn').classList.remove('btn-theme');
-                    document.getElementById('submit-btn').classList.add('btn-success');
+                setTimeout(function() {
+                    document.getElementById('submit-btn').classList.remove('btn-success');
+                    document.getElementById('submit-btn').classList.add('btn-theme');
 
-                    setTimeout(function() {
-                        document.getElementById('submit-btn').classList.remove('btn-success');
-                        document.getElementById('submit-btn').classList.add('btn-theme');
-
-                        setPanel('index');
-                    }, 5000);
-                } else {
-                    console.log('SAVE FAILURE');
-                }
-            });
-        }
-
-        reader.readAsText( file );
+                    setPanel('index');
+                }, 5000);
+            } else {
+                console.log('SAVE FAILURE');
+            }
+        });
     }
   </script>
   </body>
