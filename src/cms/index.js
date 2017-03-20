@@ -2,12 +2,12 @@ import Inferno from 'inferno';
 
 // onComponentDidMount
 function mounted() {
-    // fetch('/get-posts')
-    //     .then(res => res.json())
-    //     .then(posts => {
-    //         // after data success re-render
-    //         render({ posts });
-    //     });
+    fetch('/get-posts')
+        .then(res => res.json())
+        .then(posts => {
+            // after data success re-render
+            render({ posts });
+        });
 }
 
 function timeDifference(current, previous) {
