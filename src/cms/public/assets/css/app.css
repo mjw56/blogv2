@@ -1,0 +1,9 @@
+/* Customized Styles for the App */
+
+.post-list {
+  min-height: 200px;
+}
+
+#post-form textarea {
+  min-height: 400px;
+}
