@@ -218,23 +218,15 @@ function RightSidebar({ posts }) {
             <Posts posts={posts} /> 
             <h3>TEAM MEMBERS</h3>
             <div className="desc">
-            <div className="thumb">
-                <img className="img-circle" src="assets/img/profile.jpg" width="35px" height="35px" align="" />
-            </div>
-            <div className="details">
-                <p><a href="#">MIKE WILCOX</a><br/>
-                    <muted>Available</muted>
-                </p>
-            </div>
-            </div>
-            <div id="calendar" className="mb">
-                <div className="panel green-panel no-margin">
-                    <div className="panel-body">
-                        <div id="my-calendar"></div>
-                    </div>
+                <div className="thumb">
+                    <img className="img-circle" src="assets/img/profile.jpg" width="35px" height="35px" align="" />
                 </div>
-            </div>
-            
+                <div className="details">
+                    <p><a href="#">MIKE WILCOX</a><br/>
+                        <muted>Available</muted>
+                    </p>
+                </div>
+            </div>          
         </div>
     );
 }
