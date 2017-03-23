@@ -4,16 +4,19 @@ const database = require('../database');
 const helpers = require('./helpers');
 
 function copyFiles(cb) {
-  // read all the files in from src dir and only copy what we need
-  const srcFiles = helpers.readFiles('./src', function(files) {
-    files.filter(function(file) {
-      return file.substr(-3) === '.js' || file.substr(-4) === '.css'
-    })
-    .forEach(function(file) {
-      helpers.copyFileSync(`./src/${file}`, `public/${file}`);
-    });
+  return new Promise(function(resolve, reject) {
+    let promises = [];
+    // read all the files in from src dir and only copy what we need
+    const srcFiles = helpers.readFiles('./src', function(files) {
+      files.filter(function(file) {
+        return file.substr(-3) === '.js' || file.substr(-4) === '.css'
+      })
+      .forEach(function(file) {
+        promises.push(helpers.copyFile(`./src/${file}`, `public/${file}`));
+      });
 
-    cb();
+      Promise.all(promises).then(cb);
+    });
   });
 }
 
@@ -70,6 +73,7 @@ database.getPosts(function(posts) {
 
       console.log(`index.html was saved!`);
       copyFiles(function() {
+        console.log('done!');
         process.exit();
       });
   });

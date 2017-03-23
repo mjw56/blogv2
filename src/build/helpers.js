@@ -32,28 +32,15 @@ function clearDirSync(dirPath) {
 };
 
 // copy files from one location to another
-function copyFileSync(source, target, cb) {
-  var cbCalled = false;
-
-  var rd = fs.createReadStream(source);
-  rd.on("error", function(err) {
-    done(err);
+function copyFile(source, target) {
+  return new Promise(function(resolve, reject) {
+    var rd = fs.createReadStream(source);
+    rd.on("error", reject);
+    var wr = fs.createWriteStream(target);
+    wr.on("error", reject);
+    wr.on("close", resolve);
+    rd.pipe(wr);
   });
-  var wr = fs.createWriteStream(target);
-  wr.on("error", function(err) {
-    done(err);
-  });
-  wr.on("close", function(ex) {
-    done();
-  });
-  rd.pipe(wr);
-
-  function done(err) {
-    if (!cbCalled && typeof cb === 'function') {
-      cb(err);
-      cbCalled = true;
-    }
-  }
 }
 
 // read all files in a given directory
@@ -118,7 +105,7 @@ function writePostFile(data, onSuccess, onFailure) {
 module.exports = {
   mkdirSync: mkdirSync,
   clearDirSync: clearDirSync,
-  copyFileSync: copyFileSync,
+  copyFile: copyFile,
   readFiles: readFiles,
   getDirectories: getDirectories,
   getIndex: getIndex,
