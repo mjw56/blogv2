@@ -62,6 +62,21 @@ app.post('/save-post', function(req, res) {
     );
 });
 
+// saves post into mLab
+app.post('/update-post', function(req, res) {
+    database.updatePost(
+        req.body, 
+        Date.now(), 
+        function(posts) {
+            console.log('update success!', posts);
+            res.json(true);
+        },
+        function(err) {
+            console.log(`Error updating to Mongo ${err}`);
+        }
+    );
+});
+
 // fetches all posts saved in mLab
 app.get('/get-posts', function(req, res) {
     database.getPosts(function(posts) {

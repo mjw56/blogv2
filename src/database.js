@@ -30,6 +30,23 @@ const savePost = function(deets, timestamp, db, onSuccess, onError) {
     });
 }
 
+const updatePost = function(post, db, onSuccess, onError) {
+  db.collection('posts')
+    .update(
+      { timestamp: post.timestamp }, 
+      { $set: { deets: post.deets, timestamp: post.timestamp }},
+      function(err, result) {
+        if (err) { return onError(err); }
+
+        console.log('document updated!');
+
+        if (typeof onSuccess === 'function') {
+          onSuccess('updated!');
+        }
+      }
+    );
+}
+
 module.exports = {
   getPosts: function(onSuccess, onFailure) {
     MongoClient.connect(url, function(err, db) {
@@ -46,6 +63,15 @@ module.exports = {
       }
 
       savePost(deets, timestamp, db, onSuccess, onError);
+    });
+  },
+  updatePost: function(post, timestamp, onSuccess, onError) {
+    MongoClient.connect(url, function(err, db) {
+      if (err) {
+        return onError(err);
+      }
+
+      updatePost(post, db, onSuccess, onError);
     });
   }
 }
