@@ -29,17 +29,41 @@ function getPosts() {
 }
 
 // handle the submission of the form
-function submit() {
+function submit(event) {
+    // prevent the default browser form behavior, we'll handle it
+    event.preventDefault();
+
     var myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/json');
 
-    const data = {
-        'title': document.getElementById('title').value,
-        'content': document.getElementById('content').value,
-        'cover': document.getElementById('file-preview').src
-    };
+    let route = '';
+    let data = {};
 
-    fetch('/save-post', {
+    if (state.panel === 'new-post') {
+        route = 'save-post';
+        data = {
+            'title': document.getElementById('title').value,
+            'content': document.getElementById('content').value,
+            'cover': document.getElementById('file-preview').src
+        };
+    } else {
+        route = 'update-post';
+        const _id = document.getElementById('post-form').attributes['data-id'].nodeValue;
+
+        const post = state.posts.find(p => p._id === _id);
+
+        data = {
+            _id: post._id,
+            deets: {
+                'title': document.getElementById('title').value,
+                'content': document.getElementById('content').value,
+                'cover': document.getElementById('file-preview').src
+            },
+            timestamp: post.timestamp
+        };
+    }
+
+    fetch(route, {
         method: "POST",
         headers: myHeaders,
         body: JSON.stringify(data)
@@ -58,7 +82,7 @@ function submit() {
                 document.getElementById('submit-btn').classList.remove('btn-success');
                 document.getElementById('submit-btn').classList.add('btn-theme');
 
-                setPanel('index');
+                goHome();
             }, 5000);
         } else {
             console.log('SAVE FAILURE');
@@ -172,6 +196,13 @@ function Header() {
     );
 }
 
+// take me home
+function goHome() {
+    render({
+        state: updateState(state, { panel: 'index' })
+    });
+}
+
 // handle selection of panel from sidebar
 function selectPanel(panel) {
     render({ 
@@ -190,14 +221,14 @@ function LeftSidebar() {
                     <h5 className="centered">Mike Wilcox</h5>
                         
                     <li className="mt index" onClick={() => selectPanel('index')}>
-                        <a className="active">
+                        <a className={ state.panel === 'index' ? 'active' : ''}>
                             <i className="fa fa-dashboard"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
 
                     <li className="mt new-post" onClick={() => selectPanel('new-post')}>
-                        <a>
+                        <a className={ state.panel === 'new-post' ? 'active' : ''}>
                             <i className="fa fa-dashboard"></i>
                             <span>New Post</span>
                         </a>
@@ -231,8 +262,23 @@ function RightSidebar({ posts }) {
     );
 }
 
-function editPost(e) {
-    console.log('edit post', e);
+function editPost(event) {
+    // look up the post by grabbing id from the list element
+    let post = state.posts.find(p => p.timestamp === parseInt(event.target.attributes['data-id'].nodeValue, 10));
+
+    // check out route, switch if necessary
+    if (state.panel !== 'edit-post') {
+        selectPanel('edit-post');
+    }
+
+    document.getElementById('post-form').setAttribute('data-id', post._id);
+
+    // populate the UI fields
+    document.getElementById('title').value = post.deets.title;
+    document.getElementById('content').value = post.deets.content;
+    document.getElementById('file-preview').src = post.deets.cover;
+
+    post = null;
 }
 
 // posts list
@@ -240,7 +286,7 @@ function Posts({ posts }) {
     return (
         <div className="post-list">
             {
-                posts.map(post => (
+                posts.slice().reverse().map(post => (
                     <div className="desc">
                       <div className="thumb left">
                           <span className="badge bg-theme"><i className="fa fa-clock-o"></i></span>
@@ -250,8 +296,10 @@ function Posts({ posts }) {
                           <a>{post.deets.title}</a><br/>
                         </p>
                       </div>
-                      <div className="thumb right" onClick={editPost}>
-                          <span className="badge bg-theme"><i className="fa fa-edit"></i></span>
+                      <div className="thumb right">
+                          <span className="badge bg-theme">
+                              <i className="fa fa-edit" onClick={editPost} data-id={post.timestamp}></i>
+                        </span>
                       </div>
                     </div>
                 ))
@@ -264,18 +312,21 @@ function Posts({ posts }) {
 function HomePanel() {
     return (
         <div className="col-lg-9" id="index">
-            Welcome Home!  
+            <span className="title">Welcome Home!</span>  
         </div>
     );
 }
 
 // new post panel
-function NewPostPanel({ postTitle, postContent }) {
+function PostFormPanel({ type }) {
     return (
         <div className="col-lg-9" id="new-post">
             <div className="form-panel">
-                <h4 className="mb"><i className="fa fa-angle-right"></i> New Post</h4>
-                <form onSubmit={submit} className="form-horizontal style-form" id="post-form">
+                <div className="form-header">
+                    <h4 className="mb"><i className="fa fa-angle-right"></i> New Post</h4>
+                    <h4 className="close" onClick={goHome}>X</h4>
+                </div>
+                <form onSubmit={submit} className="form-horizontal style-form" id="post-form" data-type={type}>
                     <div className="form-group">
                         <label className="col-sm-2 col-sm-2 control-label">Title</label>
                         <div className="col-sm-10">
@@ -295,7 +346,9 @@ function NewPostPanel({ postTitle, postContent }) {
                             <img src="" alt="Image preview..." id="file-preview" name="file-preview" />
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-theme" id="submit-btn">Submit</button>
+                    <button type="submit" className="btn btn-theme" id="submit-btn">
+                        { (type === 'new') ? `Submit` : `Edit`}
+                    </button>
                 </form>
             </div>
         </div>
@@ -306,7 +359,10 @@ function NewPostPanel({ postTitle, postContent }) {
 function getPanel(panel) {
     switch(panel) {
         case 'new-post':
-            return <NewPostPanel />;
+            return <PostFormPanel type="new" />;
+            break;
+        case 'edit-post':
+            return <PostFormPanel type="edit" />;
             break;
         default:
             return <HomePanel />;
