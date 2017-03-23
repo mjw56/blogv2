@@ -1,7 +1,26 @@
 /* Customized Styles for the App */
 
+#index {
+  padding: 40px;
+}
+
+#index .title {
+  font-size: 40px;
+}
+
 .post-list {
   min-height: 200px;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 20px 0 10px;
+}
+
+.form-header .close:hover {
+  cursor: pointer;
+  opacity: 0.6;
 }
 
 #post-form textarea {
