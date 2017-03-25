@@ -75,13 +75,10 @@ function submit(event) {
             getPosts();
 
             // reset UI state
-            document.getElementById('submit-btn').classList.remove('btn-theme');
-            document.getElementById('submit-btn').classList.add('btn-success');
+            document.getElementById('submit-btn').classList.remove('purple');
+            document.getElementById('submit-btn').classList.add('green');
 
             setTimeout(function() {
-                document.getElementById('submit-btn').classList.remove('btn-success');
-                document.getElementById('submit-btn').classList.add('btn-theme');
-
                 goHome();
             }, 5000);
         } else {
@@ -321,7 +318,7 @@ function PostFormPanel({ type }) {
                         <h4 className="mb"><i className="fa fa-angle-right"></i> New Post</h4>
                         <h4 className="close" onClick={goHome}>X</h4>
                     </div>
-                    <form onSubmit={submit} className="form-horizontal style-form" id="post-form" data-type={type}>
+                    <form className="form-horizontal style-form" id="post-form" data-type={type}>
                         <div className="form-group">
                             <label className="col-sm-2 col-sm-2 control-label">Title</label>
                             <div className="col-sm-10">
@@ -341,14 +338,18 @@ function PostFormPanel({ type }) {
                                 <img src="" alt="Image preview..." id="file-preview" name="file-preview" />
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-theme" id="submit-btn">
-                            { (type === 'new') ? `Submit` : `Edit`}
-                        </button>
+                        <a class="ghost-btn purple" id="submit-btn" onClick={submit}>
+                            <span>
+                                { (type === 'new') ? `Submit` : `Edit`}
+                            </span>
+                        </a>
                     </form>
                 </div>
             </div>
             <div className="col-lg-5" id="post-preview">
-                <span class="content"></span>
+                <span class="content">
+                    <span class="preview">✨ Your post will preview here... ✨</span>
+                </span>
             </div>
         </div>
     );
@@ -361,7 +362,6 @@ function formMount() {
     formWS.onerror = () => console.log('WebSocket error');
     formWS.onopen = () => {
         console.log('WebSocket connection established');
-        formWS.send(JSON.stringify({ content: '### ✨ Your post will preview here.🎉 ✨' }));
     };
     formWS.onclose = () => console.log('WebSocket connection closed');
 

@@ -19,6 +19,7 @@ section {
 
 #index .title {
   font-size: 40px;
+  letter-spacing: 3px;
 }
 
 .wrapper {
@@ -52,6 +53,16 @@ section {
   opacity: 0.85;
 }
 
+.thumb.left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.thumb.left muted {
+  margin-bottom: 4px;
+}
+
 .ds .desc {
   display: flex;
 }
@@ -70,8 +81,11 @@ section {
     padding: auto;
     padding: 15px;
     border-top: 1px solid white;
-    border-bottom: 1px solid white;
     font-size: 16px;
+}
+
+.post-list:last-child {
+  border-bottom: 1px solid white;
 }
 
 .post-list .desc *:not(:last-child) {
@@ -107,13 +121,52 @@ section {
   margin: 0 20px 0 10px;
 }
 
+.form-header .close {
+  color: white;
+  font-weight: 100;
+  font-size: 26px;
+  opacity: 1;
+}
+
 .form-header .close:hover {
   cursor: pointer;
   opacity: 0.6;
 }
 
+.form-header .mb {
+  font-weight: 100;
+  font-size: 26px;
+}
+
+.form-panel {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    border-radius: 5px;
+}
+
+.form-horizontal.style-form .form-group  {
+  border-bottom: none;
+  margin: 15px 0;
+}
+
+.form-panel input, .form-panel textarea {
+  background: transparent;
+  color: white;
+}
+
+.form-panel label {
+  padding: 0 !important;
+  font-weight: 100;
+  font-size: 18px;
+}
+
 #post-preview {
-  margin-top: 10px;
+  margin-top: 30px;
+}
+
+#post-preview .preview {
+  font-size: 20px;
 }
 
 #post-form textarea {
