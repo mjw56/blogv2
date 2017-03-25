@@ -1,9 +1,10 @@
 const express = require('express');
+const http = require('http');
 const bodyParser = require('body-parser');
 const aws = require('aws-sdk');
 const database = require('../database');
-const http = require('http');
 const path = require('path');
+const sockets = require('./sockets');
 
 const port = 9000;
 
@@ -82,9 +83,13 @@ app.get('/get-posts', function(req, res) {
     database.getPosts(function(posts) {
         res.json(posts);
     });
-})
+});
 
-app.listen(port, () => {
+const server = http.createServer(app);
+
+server.listen(port, () => {
     console.log(`==> Server is listening on port ${port}`);
 	console.log(`==> 🌎  Go to localhost:${port}`);
 });
+
+sockets.init(server);
