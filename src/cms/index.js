@@ -184,14 +184,11 @@ function timeDifference(current, previous) {
 function Header() {
     return (
         <header className="header black-bg">
-            <div className="sidebar-toggle-box">
-                <div className="fa fa-bars tooltips"></div>
-            </div>
-            <a href="index.html" className="logo"><b>HOME</b></a>
-            <div className="nav notify-row" id="top_menu">
-                <ul className="nav top-menu">
-                </ul>
-            </div>
+            <a href="index.html" className="circle"></a>
+
+            <a class="ghost-btn orange" onClick={goNewPost}>
+                <span>+ New Post</span>
+            </a>
         </header>
     );
 }
@@ -203,41 +200,21 @@ function goHome() {
     });
 }
 
+function goNewPost() {
+    render({
+        state: updateState(state, { panel: 'new-post' })
+    });
+}
+
+function isHome(panel) {
+    return panel === 'index';
+}
+
 // handle selection of panel from sidebar
 function selectPanel(panel) {
     render({ 
         state: updateState(state, { panel })
     });
-}
-
-// left sidebar
-function LeftSidebar() {
-    return (
-        <aside>
-            <div id="sidebar"  className="nav-collapse">
-                <ul className="sidebar-menu" id="nav-accordion">
-                
-                    <p className="centered"><a><img src="assets/img/profile.jpg" className="img-circle" width="60" /></a></p>
-                    <h5 className="centered">Mike Wilcox</h5>
-                        
-                    <li className="mt index" onClick={() => selectPanel('index')}>
-                        <a className={ state.panel === 'index' ? 'active' : ''}>
-                            <i className="fa fa-dashboard"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-
-                    <li className="mt new-post" onClick={() => selectPanel('new-post')}>
-                        <a className={ state.panel === 'new-post' ? 'active' : ''}>
-                            <i className="fa fa-dashboard"></i>
-                            <span>New Post</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </div>
-        </aside>
-    );
 }
 
 // right sidebar
@@ -266,7 +243,7 @@ function editPost(event) {
     // look up the post by grabbing id from the list element
     let post = state.posts.find(p => p.timestamp === parseInt(event.target.attributes['data-id'].nodeValue, 10));
 
-    // check out route, switch if necessary
+    // check out route,     switch if necessary
     if (state.panel !== 'edit-post') {
         selectPanel('edit-post');
     }
@@ -281,6 +258,19 @@ function editPost(event) {
     post = null;
 }
 
+function previewPost() {
+    var myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+
+    fetch('/preview-post', {
+        method: 'POST',
+        headers: myHeaders,
+        body: JSON.stringify({ content: document.getElementById('content').value })
+    })
+    .then(res => res.json())
+    .then(res => console.log('GREAT SUCCESS!!', res));
+}
+
 // posts list
 function Posts({ posts }) {
     return (
@@ -290,15 +280,14 @@ function Posts({ posts }) {
                     <div className="desc">
                       <div className="thumb left">
                           <span className="badge bg-theme"><i className="fa fa-clock-o"></i></span>
+                          <muted>{timeDifference(Date.now(), post.timestamp)}</muted>
                       </div>
                       <div className="details">
-                        <p><muted>{timeDifference(Date.now(), post.timestamp)}</muted><br/>
+                        <p>
                           <a>{post.deets.title}</a><br/>
                         </p>
-                      </div>
-                      <div className="thumb right">
-                          <span className="badge bg-theme">
-                              <i className="fa fa-edit" onClick={editPost} data-id={post.timestamp}></i>
+                        <span className="badge bg-theme edit">
+                            <i className="fa fa-edit" onClick={editPost} data-id={post.timestamp}></i>
                         </span>
                       </div>
                     </div>
@@ -311,58 +300,89 @@ function Posts({ posts }) {
 // home panel
 function HomePanel() {
     return (
-        <div className="col-lg-9" id="index">
-            <span className="title">Welcome Home!</span>  
+        <div className="col-lg-12" id="index">
+            <span className="title">Welcome Home!</span><br />
+            <Posts posts={state.posts} />
         </div>
     );
+}
+
+function changeEventHandler(event) {
+    formWS.send(JSON.stringify({ content: event.target.value }));
 }
 
 // new post panel
 function PostFormPanel({ type }) {
     return (
-        <div className="col-lg-9" id="new-post">
-            <div className="form-panel">
-                <div className="form-header">
-                    <h4 className="mb"><i className="fa fa-angle-right"></i> New Post</h4>
-                    <h4 className="close" onClick={goHome}>X</h4>
+        <div>
+            <div className="col-lg-7" id="new-post">
+                <div className="form-panel">
+                    <div className="form-header">
+                        <h4 className="mb"><i className="fa fa-angle-right"></i> New Post</h4>
+                        <h4 className="close" onClick={goHome}>X</h4>
+                    </div>
+                    <form onSubmit={submit} className="form-horizontal style-form" id="post-form" data-type={type}>
+                        <div className="form-group">
+                            <label className="col-sm-2 col-sm-2 control-label">Title</label>
+                            <div className="col-sm-10">
+                                <input type="text" className="form-control" name="title" id="title" />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label className="col-sm-2 col-sm-2 control-label">Content</label>
+                            <div className="col-sm-10">
+                                <textarea type="text" className="form-control" name="content" id="content" onInput={changeEventHandler}></textarea>
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label className="col-sm-2 col-sm-2 control-label">Cover Photo</label>
+                            <div className="col-sm-10">
+                                <input type="file" className="form-control" name="file" id="file" onChange={previewFile} />
+                                <img src="" alt="Image preview..." id="file-preview" name="file-preview" />
+                            </div>
+                        </div>
+                        <button type="submit" className="btn btn-theme" id="submit-btn">
+                            { (type === 'new') ? `Submit` : `Edit`}
+                        </button>
+                    </form>
                 </div>
-                <form onSubmit={submit} className="form-horizontal style-form" id="post-form" data-type={type}>
-                    <div className="form-group">
-                        <label className="col-sm-2 col-sm-2 control-label">Title</label>
-                        <div className="col-sm-10">
-                            <input type="text" className="form-control" name="title" id="title" />
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label className="col-sm-2 col-sm-2 control-label">Content</label>
-                        <div className="col-sm-10">
-                            <textarea type="text" className="form-control" name="content" id="content"></textarea>
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label className="col-sm-2 col-sm-2 control-label">Cover Photo</label>
-                        <div className="col-sm-10">
-                            <input type="file" className="form-control" name="file" id="file" onChange={previewFile} />
-                            <img src="" alt="Image preview..." id="file-preview" name="file-preview" />
-                        </div>
-                    </div>
-                    <button type="submit" className="btn btn-theme" id="submit-btn">
-                        { (type === 'new') ? `Submit` : `Edit`}
-                    </button>
-                </form>
+            </div>
+            <div className="col-lg-5" id="post-preview">
+                <span class="content"></span>
             </div>
         </div>
     );
+}
+
+let formWS = null
+
+function formMount() {
+    formWS = new WebSocket(`ws://${location.host}`);
+    formWS.onerror = () => console.log('WebSocket error');
+    formWS.onopen = () => {
+        console.log('WebSocket connection established');
+        formWS.send(JSON.stringify({ content: '### ✨ Your post will preview here.🎉 ✨' }));
+    };
+    formWS.onclose = () => console.log('WebSocket connection closed');
+
+    formWS.onmessage = (msg) => {
+        document.getElementById('post-preview').innerHTML = msg.data;
+    }
+}
+
+function formUnmount() {
+    formWS.close();
+    formWS = null;
 }
 
 // handle switch of panels on selection
 function getPanel(panel) {
     switch(panel) {
         case 'new-post':
-            return <PostFormPanel type="new" />;
+            return <PostFormPanel type="new" onComponentDidMount={formMount} onComponentWillUnmount={formUnmount} />;
             break;
         case 'edit-post':
-            return <PostFormPanel type="edit" />;
+            return <PostFormPanel type="edit" onComponentDidMount={formMount} onComponentWillUnmount={formUnmount} />;
             break;
         default:
             return <HomePanel />;
@@ -371,20 +391,14 @@ function getPanel(panel) {
 }
 
 // app entry point
-function App({ posts, panel }) {
+function App({ posts, panel }, wut) {
     return (
         <section id="container">
             <Header />
-
-            <LeftSidebar />
-
-            <section id="main-content">
+            <section class={`${panel}-content`}>
                 <section className="wrapper">
-
                     <div className="row">
                         { getPanel(panel) }
-
-                        <RightSidebar posts={posts} />
                     </div>
                 </section>
             </section>
@@ -395,7 +409,7 @@ function App({ posts, panel }) {
 // wrapper for inferno render
 function render({ state }) {
     Inferno.render(
-        <App onComponentDidMount={ mounted } posts={state.posts} panel={state.panel} />,  
+        <App onComponentDidMount={ mounted } posts={state.posts} panel={state.panel} />,
         document.getElementById("root")
     );
 }

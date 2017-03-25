@@ -1,15 +1,104 @@
 /* Customized Styles for the App */
 
+body {
+  background-color: #1d2025;
+  color: #fff;
+  font-family: Helvetica Neue;
+  font-weight: 100;
+}
+
+section {
+  max-width: 900px;
+  margin: auto;
+}
+
 #index {
-  padding: 40px;
+  padding: 0;
+  text-align: center;
 }
 
 #index .title {
   font-size: 40px;
 }
 
+.wrapper {
+  margin-top: 0;
+}
+
+.header {
+  background: transparent;
+  border: 0;
+  max-width: 900px;
+  margin: auto;
+  padding: 15px;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.circle {
+    display: block;
+    height: 50px;
+    width: 50px;
+    margin: 4px;
+    background: -webkit-linear-gradient(#d5835b 15%, #d47966 15%, #d47966 30%, #b86b61 30%, #b86b61 42.5%, #d27486 42.5%, #d27486 52.5%, #aa617c 52.5%, #aa617c 62.5%, #a36d8f 62.5%, #a36d8f 72.5%, #766d88 72.5%, #766d88 82.5%, #313d53 82.5%);
+    background: linear-gradient(#d5835b 15%, #d47966 15%, #d47966 30%, #b86b61 30%, #b86b61 42.5%, #d27486 42.5%, #d27486 52.5%, #aa617c 52.5%, #aa617c 62.5%, #a36d8f 62.5%, #a36d8f 72.5%, #766d88 72.5%, #766d88 82.5%, #313d53 82.5%);
+    border-radius: 50%;
+}
+
+.circle:hover {
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.ds .desc {
+  display: flex;
+}
+
 .post-list {
-  min-height: 200px;
+  display: table;
+  width: 100%;
+  margin-top: 60px;
+}
+
+.post-list .desc {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    vertical-align: middle;
+    padding: auto;
+    padding: 15px;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+    font-size: 16px;
+}
+
+.post-list .desc *:not(:last-child) {
+  margin-bottom: 5px;
+}
+
+.post-list .desc .badge {
+  background: transparent;
+  font-size: 34px;
+}
+
+.post-list .desc .badge.edit:hover {
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.post-list .desc .details {
+  font-size: 34px;
+}
+
+.post-list .desc .details p {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.post-list .desc .details a {
+  color: white;
 }
 
 .form-header {
@@ -23,6 +112,88 @@
   opacity: 0.6;
 }
 
+#post-preview {
+  margin-top: 10px;
+}
+
 #post-form textarea {
   min-height: 400px;
+}
+
+.index-content, .edit-post-content, .new-post-content {
+  margin-left: 0;
+}
+
+.ghost-btn {
+  align-self: center;
+  display: inline-block;
+  margin: 1em 0;
+  padding: 1em 2em;
+  background: transparent;
+  border-radius: 3px;
+  font-weight: 400;
+  text-align: center;
+  text-decoration: none;
+}
+
+.ghost-btn:hover {
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.ghost-btn.green {
+  border-left: 2px solid #add356;
+  border-right: 2px solid #00dfa6;
+  background-image: -webkit-linear-gradient(left, #add356, #00dfa6), -webkit-linear-gradient(left, #add356, #00dfa6);
+  background-image: linear-gradient(left, #add356, #00dfa6), linear-gradient(left, #add356, #00dfa6);
+  background-size: 100% 2px;
+  background-position: 0 100%, 0 0;
+  background-repeat: no-repeat;
+  background-clip: border-box;
+}
+
+.ghost-btn.green span {
+  background: -webkit-linear-gradient(left, #add356, #00dfa6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ghost-btn.orange {
+  border-left: 2px solid #ffcb52;
+  border-right: 2px solid #ff451f;
+  background-image: -webkit-linear-gradient(left, #ffcb52, #ff451f), -webkit-linear-gradient(left, #ffcb52, #ff451f);
+  background-image: linear-gradient(left, #ffcb52, #ff451f), linear-gradient(left, #ffcb52, #ff451f);
+  background-size: 100% 2px;
+  background-position: 0 100%, 0 0;
+  background-repeat: no-repeat;
+  background-clip: border-box;
+}
+
+.ghost-btn.orange span {
+  background: -webkit-linear-gradient(left, #ffcb52, #ff451f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ghost-btn.purple {
+  border-left: 2px solid #3dade9;
+  border-right: 2px solid #bf2fcb;
+  background-image: -webkit-linear-gradient(left, #3dade9, #bf2fcb), -webkit-linear-gradient(left, #3dade9, #bf2fcb);
+  background-image: linear-gradient(left, #3dade9, #bf2fcb), linear-gradient(left, #3dade9, #bf2fcb);
+  background-size: 100% 2px;
+  background-position: 0 100%, 0 0;
+  background-repeat: no-repeat;
+  background-clip: border-box;
+}
+
+.ghost-btn.purple span {
+  background: -webkit-linear-gradient(left, #3dade9, #bf2fcb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
+		.header {
+      padding: 15px;
+    }
 }
