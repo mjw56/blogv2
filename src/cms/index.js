@@ -379,12 +379,12 @@ function PostFormPanel({ type }) {
                         </div>
                         <a class="ghost-btn purple" id="submit-btn" onClick={submit}>
                             <span>
-                                { (type === 'new') ? `Submit` : `Edit`}
+                                { (type === 'new') ? `Submit` : `Save`}
                             </span>
                         </a>
                         {
                             (type === 'edit')
-                                ? (<a class="ghost-btn orange" id="delete-btn" onClick={deletePost}>
+                                ? (<a class="ghost-btn red" id="delete-btn" onClick={deletePost}>
                                     <span>Delete</span>
                                 </a>)
                                 : null
