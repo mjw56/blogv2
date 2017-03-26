@@ -47,6 +47,22 @@ const updatePost = function(post, db, onSuccess, onError) {
     );
 }
 
+const deletePost = function(post, db, onSuccess, onError) {
+  db.collection('posts')
+    .remove(
+      { timestamp: post.timestamp }, 
+      function(err, result) {
+        if (err) { return onError(err); }
+
+        console.log('document deleted!');
+
+        if (typeof onSuccess === 'function') {
+          onSuccess('deleted!');
+        }
+      }
+    );
+}
+
 module.exports = {
   getPosts: function(onSuccess, onFailure) {
     MongoClient.connect(url, function(err, db) {
@@ -72,6 +88,15 @@ module.exports = {
       }
 
       updatePost(post, db, onSuccess, onError);
+    });
+  },
+  deletePost: function(post, onSuccess, onError) {
+    MongoClient.connect(url, function(err, db) {
+      if (err) {
+        return onError(err);
+      }
+
+      deletePost(post, db, onSuccess, onError);
     });
   }
 }
