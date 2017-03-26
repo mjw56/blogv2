@@ -78,6 +78,20 @@ app.post('/update-post', function(req, res) {
     );
 });
 
+// delete post from mLab
+app.post('/delete-post', function(req, res) {
+    database.deletePost(
+        req.body,
+        function(posts) {
+            console.log('delete success!', posts);
+            res.json(true);
+        },
+        function(err) {
+            console.log(`Error deleting from Mongo ${err}`);
+        }
+    );
+});
+
 // fetches all posts saved in mLab
 app.get('/get-posts', function(req, res) {
     database.getPosts(function(posts) {
