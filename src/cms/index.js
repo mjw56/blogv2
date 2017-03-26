@@ -80,7 +80,7 @@ function submit(event) {
 
             setTimeout(function() {
                 goHome();
-            }, 5000);
+            }, 2500);
         } else {
             console.log('SAVE FAILURE');
         }
@@ -315,7 +315,7 @@ function PostFormPanel({ type }) {
             <div className="col-lg-7" id="new-post">
                 <div className="form-panel">
                     <div className="form-header">
-                        <h4 className="mb"><i className="fa fa-angle-right"></i> New Post</h4>
+                        <h4 className="mb"><i className="fa fa-angle-right"></i> { (type === 'new') ? `New Post` : `Edit Post`}</h4>
                         <h4 className="close" onClick={goHome}>X</h4>
                     </div>
                     <form className="form-horizontal style-form" id="post-form" data-type={type}>
