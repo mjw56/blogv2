@@ -87,6 +87,45 @@ function submit(event) {
     });
 }
 
+// delete a post from the database
+function deletePost() {
+    // prevent the default browser form behavior, we'll handle it
+    event.preventDefault();
+
+    var myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+
+    const _id = document.getElementById('post-form').attributes['data-id'].nodeValue;
+    const post = state.posts.find(p => p._id === _id);
+
+    const data = {
+        timestamp: post.timestamp
+    };
+
+    fetch('delete-post', {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res) {
+            // fetch new list
+            getPosts();
+
+            // reset UI state
+            document.getElementById('delete-btn').classList.remove('orange');
+            document.getElementById('delete-btn').classList.add('green');
+
+            setTimeout(function() {
+                goHome();
+            }, 2500);
+        } else {
+            console.log('DELETE FAILURE');
+        }
+    });
+} 
+
 // this calls s3 to upload the file with the signed request
 function uploadFile(file, signedRequest, url){
     const xhr = new XMLHttpRequest();
@@ -343,6 +382,13 @@ function PostFormPanel({ type }) {
                                 { (type === 'new') ? `Submit` : `Edit`}
                             </span>
                         </a>
+                        {
+                            (type === 'edit')
+                                ? (<a class="ghost-btn orange" id="delete-btn" onClick={deletePost}>
+                                    <span>Delete</span>
+                                </a>)
+                                : null
+                        }
                     </form>
                 </div>
             </div>
