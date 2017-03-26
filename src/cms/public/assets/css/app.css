@@ -170,7 +170,7 @@ section {
 }
 
 #post-form textarea {
-  min-height: 400px;
+  min-height: 300px;
 }
 
 .index-content, .edit-post-content, .new-post-content {
@@ -224,6 +224,23 @@ section {
 
 .ghost-btn.orange span {
   background: -webkit-linear-gradient(left, #ffcb52, #ff451f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ghost-btn.red {
+  border-left: 2px solid #ff451f;
+  border-right: 2px solid red;
+  background-image: -webkit-linear-gradient(left, #ff451f, red), -webkit-linear-gradient(left, #ff451f, red);
+  background-image: linear-gradient(left, #ff451f, red), linear-gradient(left, #ff451f, red);
+  background-size: 100% 2px;
+  background-position: 0 100%, 0 0;
+  background-repeat: no-repeat;
+  background-clip: border-box;
+}
+
+.ghost-btn.red span {
+  background: -webkit-linear-gradient(left, #ff451f, red);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
