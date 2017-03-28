@@ -1,7 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
 const user = process.env.BLOG_MONGO_USER;
 const pw = process.env.BLOG_MONGO_PW;
-const url = `mongodb://${user}:${pw}@ds161008.mlab.com:61008/main-blog`;
+const server = process.env.BLOG_MONGO_SERVER;
+const url = `mongodb://${user}:${pw}@${server}/main-blog`;
 
 const getPosts = function(db) {
   return new Promise(function(resolve, reject) {
