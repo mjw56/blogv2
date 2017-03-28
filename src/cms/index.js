@@ -128,27 +128,29 @@ function deletePost() {
 
 // this calls s3 to upload the file with the signed request
 function uploadFile(file, signedRequest, url){
-    const xhr = new XMLHttpRequest();
-    xhr.open('PUT', signedRequest);
-    xhr.onreadystatechange = () => {
-        if(xhr.readyState === 4){
-            if(xhr.status === 200) {
-                document.getElementById('file-preview').src = url;
+    return new Promise(function(resolve, reject) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', signedRequest);
+        xhr.onreadystatechange = () => {
+            if(xhr.readyState === 4){
+                if(xhr.status === 200) {
+                    resolve();
+                }
+                else{
+                    reject();
+                }
             }
-            else{
-                alert('Could not upload file.');
-            }
-        }
-    };
-    xhr.send(file);
+        };
+        xhr.send(file);
+    });
 }
 
 // get signed s3 request from server
 function signS3(file) {
-    fetch(`/sign-s3?file-name=${file.name}&file-type=${file.type}`)
+    return fetch(`/sign-s3?file-name=${file.name}&file-type=${file.type}`)
         .then(res => res.json())
         .then(res => {
-            uploadFile(file, res.signedRequest, res.url);
+            return res;
         });
 }
 
@@ -169,11 +171,15 @@ function previewFile() {
         preview.src = reader.result;
     }, false);
 
-    if (file) {
+    if (file && fileIsAnImage(file.name)) {
         reader.readAsDataURL(file);
 
         // get signature for upload to s3
-        signS3(file);
+        signS3(file).then(function(res) {
+            uploadFile(file, res.signedRequest, res.url).then(function() {
+                document.getElementById('file-preview').src = res.url;
+            });
+        });
     }
 }
 
@@ -242,6 +248,11 @@ function goNewPost() {
     });
 }
 
+function fileIsAnImage(file) {
+    const regExp = new RegExp(/\.(gif|jpg|jpeg|tiff|png)$/i);
+    return regExp.test(file);
+}
+
 function isHome(panel) {
     return panel === 'index';
 }
@@ -290,7 +301,7 @@ function editPost(event) {
     document.getElementById('title').value = post.deets.title;
     document.getElementById('content').value = post.deets.content;
     document.getElementById('file-preview').src = post.deets.cover;
-
+    
     post = null;
 }
 
@@ -308,7 +319,7 @@ function previewPost() {
 }
 
 // posts list
-function Posts({ posts }) {
+function Posts({ posts = [] }) {
     return (
         <div className="post-list">
             {
@@ -347,6 +358,34 @@ function changeEventHandler(event) {
     formWS.send(JSON.stringify({ content: event.target.value }));
 }
 
+function handleImageSelection(e) {
+    // var preview = document.getElementById('file-preview');
+    var file    = document.getElementById('uploadImage').files[0];
+    var reader  = new FileReader();
+
+    if (!file) {
+        console.log('no file selected');
+        return;
+    }
+
+    if (file && fileIsAnImage(file.name)) {
+        reader.readAsDataURL(file);
+
+        // get signature for upload to s3
+        signS3(file).then(res => {
+            uploadFile(file, res.signedRequest, res.url).then(function() {
+                const content = document.getElementById('content').value;
+                const newContent = (content !== '')
+                    ? `${content}\n![${file.name}](${res.url})`
+                    : `![${file.name}](${res.url})`;
+
+                document.getElementById('content').value = newContent;
+                formWS.send(JSON.stringify({ content: document.getElementById('content').value }));
+            });
+        });
+    }
+}
+
 // new post panel
 function PostFormPanel({ type }) {
     return (
@@ -365,7 +404,13 @@ function PostFormPanel({ type }) {
                             </div>
                         </div>
                         <div className="form-group">
-                            <label className="col-sm-2 col-sm-2 control-label">Content</label>
+                            <label className="col-sm-2 col-sm-2 control-label">
+                                Content
+                                <input type="file" id="uploadImage" style={{ display: 'none' }} onChange={handleImageSelection} />
+                                <div class="content-upload-btn form-acc">
+                                    <i className="fa fa-file-image-o"></i>
+                                </div>
+                            </label>
                             <div className="col-sm-10">
                                 <textarea type="text" className="form-control" name="content" id="content" onInput={changeEventHandler}></textarea>
                             </div>
@@ -408,6 +453,11 @@ function formMount() {
     formWS.onerror = () => console.log('WebSocket error');
     formWS.onopen = () => {
         console.log('WebSocket connection established');
+
+        // check the route, are we on edit?
+        if (state.panel === 'edit-post') {
+            formWS.send(JSON.stringify({ content: document.getElementById('content').value }));
+        }
     };
     formWS.onclose = () => console.log('WebSocket connection closed');
 
