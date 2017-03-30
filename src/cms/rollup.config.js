@@ -19,6 +19,7 @@ module.exports = {
             'process.env.REDACTED_GITHUB_CLIENT_ID': JSON.stringify( `${process.env.REDACTED_GITHUB_CLIENT_ID}` )
     	}),
         typescript({
+            typescript: require('typescript'), // BYOT (bring your own typescript)
             jsx: 'Preserve', // we need the custom JSX parser for inferno
             exclude: "node_modules/**"
         }),
