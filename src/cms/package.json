@@ -17,6 +17,7 @@
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-replace": "^1.1.1",
+    "rollup-plugin-typescript": "^0.8.1",
     "rollup-plugin-uglify": "^1.0.1"
   },
   "scripts": {
