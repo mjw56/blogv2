@@ -1,12 +1,13 @@
 const express = require('express');
 const http = require('http');
+const https = require('https');
 const bodyParser = require('body-parser');
 const aws = require('aws-sdk');
 const database = require('../database');
 const path = require('path');
 const sockets = require('./sockets');
 
-const port = 9000;
+const port = 3000;
 
 const app = express();
 
@@ -97,6 +98,38 @@ app.get('/get-posts', function(req, res) {
     database.getPosts(function(posts) {
         res.json(posts);
     });
+});
+
+app.get('/callback', function(req, res) {
+    const data = JSON.stringify({
+        client_id: process.env.REDACTED_GITHUB_CLIENT_ID,
+        client_secret: process.env.REDACTED_GITHUB_CLIENT_SECRET,
+        code: req.query.code 
+    });
+
+    const options = {
+        host: 'github.com',
+        port: '443',
+        path: '/login/oauth/access_token',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json', 
+            'Content-Length': Buffer.byteLength(data)
+        }
+    };
+
+    const post_req = https.request(options, function(resp) {
+      resp.setEncoding('utf8');
+      resp.on('data', function (chunk) {
+          console.log('GitHub API Response: ' + chunk);
+          res.send(`<html><body><script>window.opener.postMessage("${chunk}", '*')</script></body></html>`);
+      });
+    }, function(err) {
+        console.log('error', err);
+    });
+
+    post_req.write(data);
+    post_req.end();
 });
 
 const server = http.createServer(app);

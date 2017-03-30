@@ -486,6 +486,26 @@ function getPanel(panel) {
     }
 }
 
+function githubLogin() {
+    function receiveMessage(event) {
+        // Do we trust the sender of this message?
+        if (event.origin !== window.location.origin) {
+            return;
+        }
+
+        // console.log(`Access Token ${event.data}`);
+        window.removeEventListener('message', receiveMessage, false);
+        githubWindow.close();
+    }
+    window.addEventListener("message", receiveMessage, false);
+
+    const githubWindow = window.open(
+        `https://github.com/login/oauth/authorize?client_id=${process.env.REDACTED_GITHUB_CLIENT_ID}&redirect_uri=http://localhost:3000/callback`, 
+        'GitHubLogin',
+        'menubar=no,location=yes,resizable=yes,status=yes,width=786,height=534'
+    );
+}
+
 // app entry point
 function App({ posts, panel }, wut) {
     return (
@@ -497,6 +517,7 @@ function App({ posts, panel }, wut) {
                         { getPanel(panel) }
                     </div>
                 </section>
+                <button onClick={githubLogin}>Login with GitHub</button>
             </section>
         </section>
     );

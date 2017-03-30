@@ -14,7 +14,8 @@ module.exports = {
     dest: 'public/bundle.js',
     plugins: [
     	replace({
-    	    'process.env.NODE_ENV': JSON.stringify( 'production' )
+    	    'process.env.NODE_ENV': JSON.stringify( 'development' ),
+            'process.env.REDACTED_GITHUB_CLIENT_ID': JSON.stringify( `${process.env.REDACTED_GITHUB_CLIENT_ID}` )
     	}),
         babel({
             presets: ['es2015-rollup'],
