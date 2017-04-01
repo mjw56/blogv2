@@ -107,6 +107,67 @@ export function FormService(store) {
         }
     }
 
+    // handle the submission of the form
+    function submit({ getPosts, goHome, store }, event) {
+        const state = store.getState();
+
+        // prevent the default browser form behavior, we'll handle it
+        event.preventDefault();
+
+        var myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'application/json');
+
+        let route = '';
+        let data = {};
+
+        if (state.panel === 'new-post') {
+            route = 'save-post';
+            data = {
+                'title': document.getElementById('title').value,
+                'content': document.getElementById('content').value,
+                'cover': document.getElementById('file-preview').src
+            };
+        } else {
+            route = 'update-post';
+            const _id = document.getElementById('post-form').attributes['data-id'].nodeValue;
+
+            const post = state.posts.find(p => p._id === _id);
+
+            data = {
+                _id: post._id,
+                deets: {
+                    'title': document.getElementById('title').value,
+                    'content': document.getElementById('content').value,
+                    'cover': document.getElementById('file-preview').src
+                },
+                timestamp: post.timestamp
+            };
+        }
+
+        fetch(route, {
+            method: "POST",
+            headers: myHeaders,
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res) {
+                // fetch new list
+                getPosts();
+
+                // reset UI state
+                document.getElementById('submit-btn').classList.remove('purple');
+                document.getElementById('submit-btn').classList.add('green');
+
+                setTimeout(function() {
+                    goHome();
+                }, 2500);
+            } else {
+                console.log('SAVE FAILURE');
+            }
+        });
+    }
+
     // delete a post from the database
     function deletePost({ store, getPosts, goHome }) {
         const state = store.getState();

@@ -7,37 +7,36 @@ import { Api } from '../services/Api';
 import { FormService } from '../services/Form';
 
 // handle switch of panels on selection
-function getPanel({ goHome, getPosts, panel, store }) {
+function getPanel({ goHome, getPosts, store }) {
   const state = store.getState();
 
   const formService = FormService(store);
 
-  if (panel === 'index') {
+  if (state.panel === 'index') {
       return <Home posts={state.posts} />;
   }
 
   return (
       <Form 
-          type={panel} 
           onComponentDidMount={formService.formMount} 
           onComponentWillUnmount={formService.formUnmount} 
-          goHome={linkEvent(store, goHome)} 
-          changeEventHandler={formService.changeEventHandler}
-          previewFile={formService.previewFile}
-          deletePost={linkEvent({ store, getPosts, goHome }, formService.deletePost)}
+          goHome={linkEvent(store, goHome)}
+          getPosts={linkEvent(store, getPosts)}
+          FormService={FormService}
       />
   );
 }
 
 // app entry point
-export function App({ AppService, auth, posts, panel }, { store }) {
+export function App({ AppService }, { store }) {
     let landing;
+
+    const { auth, posts, panel } = store.getState();
 
     if (auth) {
         landing = getPanel({
           getPosts: AppService.getPosts, 
           goHome: AppService.goHome, 
-          panel, 
           store 
         });
     } else {

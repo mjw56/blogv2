@@ -1,7 +1,6 @@
 import { linkEvent, render } from 'inferno';
 import createElement from 'inferno-create-element';
 import { Api } from './services/Api';
-import { fileIsAnImage } from './services/Misc';
 import { createStore } from './services/Store';
 import { Provider } from './components/Provider';
 import { App } from './components/App';
@@ -31,19 +30,16 @@ function mounted() {
 }
 
 // wrapper for inferno render
-function renderApp({ panel, posts, auth }) {
+function renderApp() {
     render(
         <Provider store={store}>
             <App
                 onComponentDidMount={mounted}
-                AppService={AppService}  
-                posts={posts} 
-                panel={panel} 
-                auth={auth} 
+                AppService={AppService}
             />
         </Provider>,
         document.getElementById("root")
     );
 }
 
-renderApp(store.getState());
+renderApp();
