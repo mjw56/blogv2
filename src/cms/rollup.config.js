@@ -8,9 +8,7 @@ const nodeResolve = require('rollup-plugin-node-resolve');
 const replace = require('rollup-plugin-replace');
 
 module.exports = {
-    format: 'umd',
-    moduleId: 'Inferno',
-    moduleName: 'Inferno',
+    format: 'cjs',
     entry: "./index.tsx",
     dest: 'public/bundle.js',
     plugins: [
@@ -19,18 +17,16 @@ module.exports = {
             'process.env.REDACTED_GITHUB_CLIENT_ID': JSON.stringify( `${process.env.REDACTED_GITHUB_CLIENT_ID}` )
     	}),
         typescript({
-            typescript: require('typescript'), // BYOT (bring your own typescript)
-            jsx: 'Preserve', // we need the custom JSX parser for inferno
-            exclude: "node_modules/**"
-        }),
-        // do a once over to finish up JSX
-        babel({
-            presets: ['es2015-rollup'],
-            plugins: ['inferno'],
+            typescript: require('typescript'), // use latest typescript compiler
+            jsx: 'react', // we need the custom JSX parser for inferno
+            jsxFactory: 'createElement',
             exclude: "node_modules/**"
         }),
         commonjs({
             include: 'node_modules/**',
+            namedExports: {
+                './node_modules/inferno': ['linkEvent', 'render']
+            }
         }),
     	nodeResolve({
     	    module: true,

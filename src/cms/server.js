@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const aws = require('aws-sdk');
 const database = require('../database');
 const path = require('path');
-const sockets = require('./sockets');
+const sockets = require('./services/Sockets');
 
 const port = 3000;
 
