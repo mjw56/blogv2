@@ -47,7 +47,6 @@ section {
     display: block;
     height: 50px;
     width: 50px;
-    margin: 4px;
     background: -webkit-linear-gradient(#d5835b 15%, #d47966 15%, #d47966 30%, #b86b61 30%, #b86b61 42.5%, #d27486 42.5%, #d27486 52.5%, #aa617c 52.5%, #aa617c 62.5%, #a36d8f 62.5%, #a36d8f 72.5%, #766d88 72.5%, #766d88 82.5%, #313d53 82.5%);
     background: linear-gradient(#d5835b 15%, #d47966 15%, #d47966 30%, #b86b61 30%, #b86b61 42.5%, #d27486 42.5%, #d27486 52.5%, #aa617c 52.5%, #aa617c 62.5%, #a36d8f 62.5%, #a36d8f 72.5%, #766d88 72.5%, #766d88 82.5%, #313d53 82.5%);
     border-radius: 50%;
@@ -291,6 +290,13 @@ section {
   position: relative;
   top: 100px;
   float: right;
+}
+
+.component_avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 3px;
+  border: 0;
 }
 
 @media (max-width: 768px) {

@@ -8,12 +8,12 @@ export const AppService = {
       });
   },
 
-  getPosts: function(store) {
-    fetch('/get-posts')
-        .then(res => res.json())
-        .then(posts => {
-            // after data success re-render
-            store.updateState({ posts })
-        });
+  getPosts: function() {
+    return new Promise(function(resolve, reject) {
+        fetch('/get-posts')
+            .then(res => res.json())
+            .then(res => resolve(res))
+            .catch(err => reject(err));
+    });
   }
 }

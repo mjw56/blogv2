@@ -19,7 +19,8 @@ import { RouterService } from './services/Router';
 const initialState = {
     route: 'index',
     posts: [],
-    auth: false
+    auth: false,
+    user: {}
 };
 
 // init store

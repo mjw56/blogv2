@@ -7,10 +7,13 @@ export function GitHub({ token }) {
   const githubBase = 'https://api.github.com';
 
   function request(path: string) {
-    const headers = getHeaders();
-    fetch(`${githubBase}${path}`, { headers })
-      .then(res => res.json())
-      .then(res => console.log(`deets for ${path}:`, res));
+    return new Promise(function(resolve, reject) {
+      const headers = getHeaders();
+      fetch(`${githubBase}${path}`, { headers })
+        .then(res => res.json())
+        .then(res => resolve(res))
+        .catch(err => reject(err));
+    });
   }
 
   function getHeaders(headers?: any) {
