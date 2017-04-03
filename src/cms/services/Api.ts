@@ -1,4 +1,4 @@
-import { createCookie, readCookie } from './Cookies';
+import { createCookie, readCookie, eraseCookie } from './Cookies';
 import { GitHub } from './GitHub';
 
 // Currently handling Client-Side Auth
@@ -23,6 +23,11 @@ function API() {
     return access_token;
   }
 
+  function eraseToken() {
+    access_token = null;
+    eraseCookie(cookie_key);
+  }
+
   function callGitHub(path: string): Promise<any> {
     return githubAPI.request(path);
   }
@@ -31,6 +36,7 @@ function API() {
     hasToken,
     setToken,
     getToken,
+    eraseToken,
     callGitHub,
   };
 }

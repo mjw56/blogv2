@@ -1,5 +1,9 @@
 /* Customized Styles for the App */
 
+html, body {
+  height: 100%;
+}
+
 body {
   background-color: #1d2025;
   color: #fff;
@@ -7,7 +11,11 @@ body {
   font-weight: 100;
 }
 
-section {
+#root, #container {
+  height: 100%;
+}
+
+#root {
   max-width: 900px;
   margin: auto;
 }
@@ -36,7 +44,7 @@ section {
   border: 0;
   max-width: 900px;
   margin: auto;
-  padding: 15px;
+  padding: 15px 0 0 15px;
   position: relative;
   display: flex;
   flex-direction: row;
@@ -55,6 +63,18 @@ section {
 .circle:hover {
   cursor: pointer;
   opacity: 0.85;
+}
+
+.content.login {
+    height: 70%;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+
+label[for=login-cbx] {
+  font-weight: 100;
+  margin-left: 5px;
 }
 
 .thumb.left {
@@ -188,7 +208,7 @@ section {
 .ghost-btn {
   align-self: center;
   display: inline-block;
-  margin: 10px;
+  margin: 0 0 5px 0;
   padding: 1em 2em;
   background: transparent;
   border-radius: 3px;
@@ -198,8 +218,13 @@ section {
 }
 
 .ghost-btn:hover {
+  text-decoration: none;
   cursor: pointer;
   opacity: 0.85;
+}
+
+.ghost-btn i {
+  display: inline;
 }
 
 .ghost-btn.green {
@@ -293,10 +318,53 @@ section {
 }
 
 .component_avatar {
-  height: 40px;
-  width: 40px;
+  height: 50px;
+  width: 50px;
   border-radius: 3px;
   border: 0;
+}
+
+.component_avatar:hover {
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.sub-menu { 
+  background-color: transparent;
+  visibility: hidden; /* hides sub-menu */
+  opacity: 0;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 100px;
+  min-height: 25px;
+  padding: 5px;
+  text-align: right;
+  transform: translateY(-2em);
+  z-index: -1;
+  transition: all 0.3s ease-in-out 0s, visibility 0s linear 0.3s, z-index 0s linear 0.01s;
+}
+
+.sub-menu:hover {
+  visibility: visible; /* shows sub-menu */
+  opacity: 1;
+}
+
+.sub-menu li {
+  list-style: none;
+}
+
+.sub-menu li:hover {
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.menu-wrapper:hover .sub-menu {
+  visibility: visible; /* shows sub-menu */
+  opacity: 1;
+  z-index: 1;
+  transform: translateY(0%);
+  transition-delay: 0s, 0s, 0.3s; /* this removes the transition delay so the menu will be visible while the other styles transition */
 }
 
 @media (max-width: 768px) {
@@ -310,3 +378,4 @@ section {
 .fa-clock-o:before{content:"\f017"}
 .fa-file-image-o:before{content:"\f1c5"}
 .fa-edit:before,.fa-pencil-square-o:before{content:"\f044"}
+.fa-github:before{content:"\f09b"}

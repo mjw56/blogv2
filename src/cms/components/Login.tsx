@@ -7,7 +7,10 @@ import { Api } from '../services/Api';
 export function Login({ }, { store }) {
     return (
       <div>
-        <button onClick={linkEvent({ Api, store }, AppService.login)}>Login with GitHub</button>
+        <a className="ghost-btn orange" onClick={linkEvent({ Api, store }, AppService.login)}>
+          <span>Login with GitHub <i className="fa fa-github"></i></span>
+        </a>
+        <br />
         <input type="checkbox" id="login-cbx" />
         <label for="login-cbx">Remember Me</label>
       </div>

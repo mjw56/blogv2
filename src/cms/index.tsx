@@ -16,10 +16,11 @@ import { createStore } from './services/Store';
 import { AppService } from './services/App';
 import { RouterService } from './services/Router';
 
+const hasToken = Api.hasToken();
 const initialState = {
-    route: 'index',
+    route: hasToken ? 'index' : 'login',
     posts: [],
-    auth: false,
+    auth: hasToken,
     user: {}
 };
 
@@ -29,26 +30,11 @@ let store = createStore(initialState, renderApp);
 // init router
 const router = RouterService(store);
 
-// onComponentDidMount
-function mounted() {
-    let auth;
-    if (Api.hasToken()) {
-        auth = true;
-    } else {
-        auth = false;
-    }
-
-    store.updateState({ auth });
-}
-
 // render fn
 function renderApp() {
     render(
         <Provider store={store} router={router}>
-            <App
-                onComponentDidMount={mounted}
-                AppService={AppService}
-            >
+            <App AppService={AppService}>
                 <Route path="login" component={Login} />
                 <AuthRoute path="index" component={Home} />
                 <AuthRoute path="new-post" component={Form} />

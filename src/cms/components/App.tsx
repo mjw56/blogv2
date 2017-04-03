@@ -13,11 +13,7 @@ export function App({ AppService, children }, { store }) {
         <section id="container">
             <Header auth={auth} />
             <section class={`content ${route}`}>
-                <section className="wrapper">
-                    <div className="row">
-                        { children }
-                    </div>
-                </section>
+                { children }
             </section>
         </section>
     );
