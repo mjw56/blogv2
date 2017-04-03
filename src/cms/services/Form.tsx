@@ -1,5 +1,8 @@
 import { fileIsAnImage, signS3 } from './Misc';
 
+// Form Service
+// Currently andles form logistics 
+// (form setup/destroy, WebSocket communication, Image uploads)
 export function FormService(store) {
     let formWS = null;
 
@@ -60,7 +63,7 @@ export function FormService(store) {
             console.log('WebSocket connection established');
 
             // check the route, are we on edit?
-            if (state.panel === 'edit-post') {
+            if (state.route === 'edit-post') {
                 formWS.send(JSON.stringify({ content: document.getElementById('content').value }));
             }
         };
@@ -77,6 +80,7 @@ export function FormService(store) {
     }
 
     function changeEventHandler(event) {
+        console.log('hi', event.target.value);
         formWS.send(JSON.stringify({ content: event.target.value }));
     }
 
@@ -108,7 +112,7 @@ export function FormService(store) {
     }
 
     // handle the submission of the form
-    function submit({ getPosts, goHome, store }, event) {
+    function submit({ getPosts, router, store }, event) {
         const state = store.getState();
 
         // prevent the default browser form behavior, we'll handle it
@@ -120,7 +124,7 @@ export function FormService(store) {
         let route = '';
         let data = {};
 
-        if (state.panel === 'new-post') {
+        if (state.route === 'new-post') {
             route = 'save-post';
             data = {
                 'title': document.getElementById('title').value,
@@ -160,7 +164,7 @@ export function FormService(store) {
                 document.getElementById('submit-btn').classList.add('green');
 
                 setTimeout(function() {
-                    goHome();
+                    router.go('index');
                 }, 2500);
             } else {
                 console.log('SAVE FAILURE');
@@ -169,7 +173,7 @@ export function FormService(store) {
     }
 
     // delete a post from the database
-    function deletePost({ store, getPosts, goHome }) {
+    function deletePost({ store, getPosts, router }) {
         const state = store.getState();
 
         // prevent the default browser form behavior, we'll handle it
@@ -201,7 +205,7 @@ export function FormService(store) {
                 document.getElementById('delete-btn').classList.add('green');
 
                 setTimeout(function() {
-                    goHome(store);
+                    router.go('index');
                 }, 2500);
             } else {
                 console.log('DELETE FAILURE');
@@ -215,6 +219,7 @@ export function FormService(store) {
         changeEventHandler,
         handleImageSelection,
         previewFile,
-        deletePost
+        deletePost,
+        submit
     }
 }

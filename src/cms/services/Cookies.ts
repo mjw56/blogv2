@@ -1,3 +1,5 @@
+// functions which handle set/get of client side cookies
+
 export function createCookie(name: string, value: string, days?: number): void {
     var expires = '; expires = Fri, 31 Dec 9999 23:59:59 GMT'; // default to forever ;)
     if (days) {

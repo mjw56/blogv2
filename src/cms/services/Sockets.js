@@ -2,6 +2,9 @@ const WebSocket = require('ws');
 const showdown = require('showdown');
 const converter = new showdown.Converter();
 
+// Sockets Service
+// Handles Client <-> Server WebSocket Communication
+
 function handleMessage(ws, message) {
     let parsedMessage;
     try {

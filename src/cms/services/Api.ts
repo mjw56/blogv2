@@ -1,14 +1,11 @@
 import { createCookie, readCookie } from './Cookies';
 import { GitHub } from './GitHub';
 
+// Currently handling Client-Side Auth
 function API() {
   let cookie_key: string = 'redacted';
   let access_token: string = readCookie(cookie_key);
-  let githubAPI;
-
-  if (access_token) {
-    githubAPI = GitHub({ token: access_token });
-  }
+  let githubAPI = access_token ? GitHub({ token: access_token }) : null;
 
   function hasToken() {
     return typeof access_token === 'string' && access_token !== '';

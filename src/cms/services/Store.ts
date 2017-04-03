@@ -1,4 +1,5 @@
-// store to hold global UI state
+// Store Service
+// Holds all global state for application
 export function createStore(initialState = {}, render): { getState: Function, updateState: Function } {
   let state = initialState;
 

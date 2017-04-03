@@ -1,5 +1,7 @@
 import { getTokenFromString } from './Misc';
 
+// GitHub Service
+// Currently handles all communications with GitHub API
 export function GitHub({ token }) {
   const access_token = token;
   const githubBase = 'https://api.github.com';

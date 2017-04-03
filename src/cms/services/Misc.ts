@@ -1,3 +1,5 @@
+// Miscellaneous Helper Functions
+
 // get oauth token from response string
 export function getTokenFromString(tokenString: string): string {
   return tokenString.substring(tokenString.indexOf('=') + 1, tokenString.indexOf('&'));

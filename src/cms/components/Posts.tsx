@@ -1,7 +1,7 @@
 import createElement from 'inferno-create-element';
 import { fileIsAnImage, getTokenFromString, timeDifference } from '../services/Misc';
 
-// posts list
+// List of Posts in DB
 export const Posts = ({ posts = [], editPost }) => (
     <div className="post-list">
         {

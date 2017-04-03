@@ -1,55 +1,21 @@
 import createElement from 'inferno-create-element';
 import { linkEvent } from 'inferno';
 import { Header } from './Header';
-import Home from './Home';
+import { Home } from './Home';
 import Form from './Form';
 import { Api } from '../services/Api';
 import { FormService } from '../services/Form';
 
-// handle switch of panels on selection
-function getPanel({ goHome, getPosts, store }) {
-  const state = store.getState();
-
-  const formService = FormService(store);
-
-  if (state.panel === 'index') {
-      return <Home posts={state.posts} />;
-  }
-
-  return (
-      <Form 
-          onComponentDidMount={formService.formMount} 
-          onComponentWillUnmount={formService.formUnmount} 
-          goHome={linkEvent(store, goHome)}
-          getPosts={linkEvent(store, getPosts)}
-          FormService={FormService}
-      />
-  );
-}
-
-// app entry point
-export function App({ AppService }, { store }) {
-    let landing;
-
-    const { auth, posts, panel } = store.getState();
-
-    if (auth) {
-        landing = getPanel({
-          getPosts: AppService.getPosts, 
-          goHome: AppService.goHome, 
-          store 
-        });
-    } else {
-        landing = (<button onClick={linkEvent({ Api, store}, AppService.login)}>Login with GitHub</button>);
-    }
-
+// Main App Shell
+export function App({ AppService, children }, { store }) {
+    const { auth, route } = store.getState();
     return (
         <section id="container">
-            <Header auth={auth} goNewPost={linkEvent(store, AppService.goNewPost)} />
-            <section class={`${panel}-content`}>
+            <Header auth={auth} />
+            <section class={`content ${route}`}>
                 <section className="wrapper">
                     <div className="row">
-                        { landing }
+                        { children }
                     </div>
                 </section>
             </section>
