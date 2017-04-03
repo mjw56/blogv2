@@ -38,7 +38,7 @@ export function GitHub({ token }) {
   };
 }
 
-export function githubLoginFlow(api) {
+export function githubLoginFlow(api, rememberMe) {
     return new Promise(function(resolve, reject) {
         function receiveMessage(event) {
             // Do we trust the sender of this message?
@@ -49,7 +49,7 @@ export function githubLoginFlow(api) {
             window.removeEventListener('message', receiveMessage, false);
             githubWindow.close();
 
-            api.setToken(getTokenFromString(event.data));
+            api.setToken(getTokenFromString(event.data), rememberMe);
             resolve();
         }
         window.addEventListener("message", receiveMessage, false);

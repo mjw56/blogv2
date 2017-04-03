@@ -8,6 +8,8 @@ export function Login({ }, { store }) {
     return (
       <div>
         <button onClick={linkEvent({ Api, store }, AppService.login)}>Login with GitHub</button>
+        <input type="checkbox" id="login-cbx" />
+        <label for="login-cbx">Remember Me</label>
       </div>
     );
 }

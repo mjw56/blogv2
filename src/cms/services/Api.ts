@@ -11,9 +11,11 @@ function API() {
     return typeof access_token === 'string' && access_token !== '';
   }
 
-  function setToken(token: string): void {
+  function setToken(token: string, rememberMe?: boolean): void {
     access_token = token;
-    createCookie(cookie_key, access_token);
+    if (rememberMe) {
+      createCookie(cookie_key, access_token);
+    }
     githubAPI = GitHub({ token: access_token });
   }
 

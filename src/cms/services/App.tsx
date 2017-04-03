@@ -2,7 +2,9 @@ import { githubLoginFlow } from './Github';
 
 export const AppService = {
   login: function({ store, Api }) {
-      githubLoginFlow(Api).then(function() {
+      const rememberMe = !!document.querySelector('#login-cbx:checked');
+
+      githubLoginFlow(Api, rememberMe).then(function() {
           store.updateState({ auth: true });
           Api.callGitHub('/user');
       });
