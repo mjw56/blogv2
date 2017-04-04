@@ -1,5 +1,6 @@
 // functions which handle set/get of client side cookies
 
+// create a name/value cookie for an amount of time or infinity
 export function createCookie(name: string, value: string, days?: number): void {
     var expires = '; expires = Fri, 31 Dec 9999 23:59:59 GMT'; // default to forever ;)
     if (days) {
@@ -11,6 +12,7 @@ export function createCookie(name: string, value: string, days?: number): void {
     document.cookie = `${name}=${value}${expires}; path=/`;
 }
 
+// read a cookie by name
 export function readCookie(name): string {
     const cookies = document.cookie.split(';');
     
@@ -23,6 +25,7 @@ export function readCookie(name): string {
     return myCookie.split('=')[1];
 }
 
+// erase a cookie by name
 export function eraseCookie(name) {
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
 }

@@ -1,8 +1,7 @@
 import Component from 'inferno-component';
 import createElement from 'inferno-create-element';
 import { linkEvent } from 'inferno';
-import Posts from './Posts';
-import { Api } from '../services/Api';
+import { Posts } from './Posts';
 import { AppService } from '../services/App';
 import { PostsService } from '../services/Posts';
 
@@ -15,15 +14,11 @@ export class Home extends Component<any, any> {
     componentDidMount() {
       // when home mounts we need to fetch posts and the user deets
       // we should then call the store to update the state
-      Promise.all([AppService.getPosts(), Api.callGitHub('/user')])
+      Promise.all([AppService.getPosts(), this.context.api.callGitHub('/user')])
         .then(res => {
             // update store!
             this.context.store.updateState({ posts: res[0], user: res[1] });
         });
-    }
-
-    componentWillReceiveProps(nextProps) {
-        console.log('hi!', this.context.store.getState());
     }
 
 	render() {

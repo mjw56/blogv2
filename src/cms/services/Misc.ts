@@ -26,39 +26,38 @@ export function signS3(file: { name: string, type: string }): Promise<SignedRequ
 
 // helper for UI time display
 export function timeDifference(current, previous) {
-    var msPerMinute = 60 * 1000;
-    var msPerHour = msPerMinute * 60;
-    var msPerDay = msPerHour * 24;
-    var msPerMonth = msPerDay * 30;
-    var msPerYear = msPerDay * 365;
+    const msPerSecond = 1000;
+    const msPerMinute = 60 * 1000;
+    const msPerHour = msPerMinute * 60;
+    const msPerDay = msPerHour * 24;
+    const msPerMonth = msPerDay * 30;
+    const msPerYear = msPerDay * 365;
 
-    var elapsed = current - previous;
+    const elapsed = current - previous;
+
+    function getDecimalUnit(time, unit) {
+        return (time > 1) ? `${unit}s` : unit;
+    }
 
     if (elapsed < 30 * 1000) {
-         return 'Just Now';   
-    }
-
-    else if (elapsed < msPerMinute) {
-         return Math.round(elapsed/1000) + ' seconds ago';   
-    }
-
-    else if (elapsed < msPerHour) {
-         return Math.round(elapsed/msPerMinute) + ' minutes ago';   
-    }
-
-    else if (elapsed < msPerDay ) {
-         return Math.round(elapsed/msPerHour ) + ' hours ago';   
-    }
-
-    else if (elapsed < msPerMonth) {
-        return Math.round(elapsed/msPerDay) + ' days ago';   
-    }
-
-    else if (elapsed < msPerYear) {
-        return Math.round(elapsed/msPerMonth) + ' months ago';   
-    }
-
-    else {
-        return Math.round(elapsed/msPerYear ) + ' years ago';   
+        return 'Just Now';   
+    } else if (elapsed < msPerMinute) {
+        const unit = getDecimalUnit(Math.round(elapsed/msPerSecond), 'second');
+        return `${Math.round(elapsed/msPerSecond)} ${unit} ago`;   
+    } else if (elapsed < msPerHour) {
+        const unit = getDecimalUnit(Math.round(elapsed/msPerMinute), 'minute');
+        return `${Math.round(elapsed/msPerMinute)} ${unit} ago`;   
+    } else if (elapsed < msPerDay ) {
+        const unit = getDecimalUnit(Math.round(elapsed/msPerHour), 'hour');
+        return `${Math.round(elapsed/msPerHour)} ${unit} ago`;   
+    } else if (elapsed < msPerMonth) {
+        const unit = getDecimalUnit(Math.round(elapsed/msPerDay), 'day');
+        return `${Math.round(elapsed/msPerDay)} ${unit} ago`;   
+    } else if (elapsed < msPerYear) {
+        const unit = getDecimalUnit(Math.round(elapsed/msPerMonth), 'month');
+        return `${Math.round(elapsed/msPerMonth)} ${unit} ago`;
+    } else {
+        const unit = getDecimalUnit(Math.round(elapsed/msPerYear), 'year');
+        return `${Math.round(elapsed/msPerYear)} ${unit} ago`;   
     }
 }

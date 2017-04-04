@@ -1,8 +1,10 @@
 // Store Service
 // Holds all global state for application
 export function createStore(initialState = {}, render): { getState: Function, updateState: Function } {
+  // initial state passed in
   let state = initialState;
 
+  // get the current state
   const getState = function() {
     return state;
   }
@@ -17,6 +19,7 @@ export function createStore(initialState = {}, render): { getState: Function, up
     });
   };
 
+  // return API
   return {
     getState,
     updateState

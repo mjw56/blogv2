@@ -1,5 +1,5 @@
 import createElement from 'inferno-create-element';
-import { fileIsAnImage, getTokenFromString, timeDifference } from '../services/Misc';
+import { timeDifference } from '../services/Misc';
 
 // List of Posts in DB
 export const Posts = ({ posts = [], editPost }) => (
@@ -24,5 +24,3 @@ export const Posts = ({ posts = [], editPost }) => (
         }
     </div>
 );
-
-export default Posts;

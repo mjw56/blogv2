@@ -1,13 +1,12 @@
 import createElement from 'inferno-create-element';
 import { linkEvent } from 'inferno';
 import { AppService } from '../services/App';
-import { Api } from '../services/Api';
 
 // Login Screen when No-Auth
-export function Login({ }, { store }) {
+export function Login({ }, { api, store }) {
     return (
       <div>
-        <a className="ghost-btn orange" onClick={linkEvent({ Api, store }, AppService.login)}>
+        <a className="ghost-btn orange" onClick={linkEvent({ api, store }, AppService.login)}>
           <span>Login with GitHub <i className="fa fa-github"></i></span>
         </a>
         <br />

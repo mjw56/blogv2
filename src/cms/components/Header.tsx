@@ -1,5 +1,4 @@
 import createElement from 'inferno-create-element';
-import { linkEvent } from 'inferno';
 import { HeaderAuth } from './Header.Auth';
 import { HeaderNonAuth } from './Header.NonAuth';
 

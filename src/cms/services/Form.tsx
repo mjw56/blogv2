@@ -54,6 +54,7 @@ export function FormService(store) {
         }
     }
 
+    // when form mounts, boot up the web socket
     function formMount() {
         const state = store.getState();
 
@@ -74,16 +75,18 @@ export function FormService(store) {
         }
     }
 
+    // when form unmounts, destroy the web socket
     function formUnmount() {
         formWS.close();
         formWS = null;
     }
 
+    // listen for when the textarea has been updated
     function changeEventHandler(event) {
-        console.log('hi', event.target.value);
         formWS.send(JSON.stringify({ content: event.target.value }));
     }
 
+    // handle uploading of an image into the form content
     function handleImageSelection() {
         var file = document.getElementById('uploadImage').files[0];
         var reader = new FileReader();

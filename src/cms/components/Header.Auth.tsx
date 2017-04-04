@@ -4,11 +4,11 @@ import { Avatar } from './Avatar';
 import { AppService } from '../services/App';
 
 // Auth Header
-export const HeaderAuth = ({ avatar }, { store }) => (
+export const HeaderAuth = ({ avatar }, { api, store }) => (
   <div className="menu-wrapper">
     <Avatar avatar={avatar} />
     <ul className="sub-menu">
-      <li onClick={linkEvent(store, AppService.logout)}>Logout</li>
+      <li onClick={linkEvent({ api, store }, AppService.logout)}>Logout</li>
     </ul>
   </div>
 );
