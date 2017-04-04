@@ -16,11 +16,16 @@ import { createStore } from './services/Store';
 import { AppService } from './services/App';
 import { RouterService } from './services/Router';
 
-API().then(function({ api, user }) {
+// see if there is an access token sitting
+// in cookies. if so, fetch the users deets
+// and construct API with token + deets
+AppService.init().then((config) => { 
+    const api = new API(config);
+
     const auth = api.hasToken();
     const initialState = {
         auth,
-        user,
+        user: api.getUser(),
         route: auth ? 'index' : 'login',
         posts: []
     };

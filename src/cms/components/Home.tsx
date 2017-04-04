@@ -14,10 +14,10 @@ export class Home extends Component<any, any> {
     componentDidMount() {
       // when home mounts we need to fetch posts and the user deets
       // we should then call the store to update the state
-      Promise.all([AppService.getPosts(), this.context.api.callGitHub('/user')])
+      Promise.all([AppService.getPosts()])
         .then(res => {
             // update store!
-            this.context.store.updateState({ posts: res[0], user: res[1] });
+            this.context.store.updateState({ posts: res[0] });
         });
     }
 
