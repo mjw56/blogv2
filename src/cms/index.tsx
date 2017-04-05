@@ -31,7 +31,7 @@ AppService.init().then((config) => {
     };
 
     // init store
-    let store = createStore(initialState, renderApp);
+    let store = createStore(initialState);
 
     // init router
     const router = RouterService(store);
