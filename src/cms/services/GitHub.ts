@@ -5,9 +5,12 @@ interface GitHubAPIInterface {
   setToken(token: string, rememberMe?: boolean): Promise<Object>;
   eraseToken(): void;
   getUser(): Object;
+  getRepo(repo: string): Promise<Object>;
+  forkRepo(Object: { owner: string, repo: string }): Promise<Object>;
   setUser(): Promise<Object>;
   getHeaders(input: { headers?: Object }): Object;
-  request(path: string, options?: Object)
+  request(path: string, options?: Object): Promise<Object>;
+  login(rememberMe: boolean): Promise<Object>;
 }
 
 /**
@@ -52,6 +55,16 @@ export class GitHubAPI implements GitHubAPIInterface {
     return this.user;
   }
 
+  // get repo contents, or just check for existence
+  getRepo(repo: string) {
+    return this.request(`/repos/:username/${repo}`);
+  }
+
+  // fork a repo
+  forkRepo({ owner, repo }) {
+    return this.request(`/repos/${owner}/${repo}/forks`, { method: 'POST' });
+  }
+
   setUser() {
     return this.request('/user')
       .then(user => { 
@@ -77,21 +90,16 @@ export class GitHubAPI implements GitHubAPIInterface {
     return options;
   }
 
-  request(path: string = '', options?) {
+  request(path: string = '', options = {}) {
     const assembledPath = this.user ? path.replace(':username', this.user.login) : path;
 
     return new Promise((resolve, reject) => {
-      const headers = this.getHeaders({ headers: options });
-      fetch(`${this.base_url}${assembledPath}`, { headers })
+      const headers = this.getHeaders({});
+      fetch(`${this.base_url}${assembledPath}`, { headers, ...options })
         .then(res => res.json())
         .then(res => resolve(res))
         .catch(err => reject(err));
     });
-  }
-
-  // create a fork of base repo
-  createFork(repo) {
-    return this.request('/repos/github/opensource.guide/forks', { method: 'POST' });
   }
 
   // handle opening new window for github oauth login
@@ -100,7 +108,7 @@ export class GitHubAPI implements GitHubAPIInterface {
   // for the token handshake through the callback param
   // provided which directs to the server and then responds
   // with the access_token which is relayed back to parent window 
-  login(rememberMe) {
+  login() {
     return new Promise((resolve, reject) => {
         // handle messages received from popup window
         const receiveMessage = (event) => {
@@ -116,7 +124,7 @@ export class GitHubAPI implements GitHubAPIInterface {
             githubWindow.close();
 
             // set token and get user deets once, resolve these deets back to caller
-            this.setToken(getTokenFromString(event.data), rememberMe)
+            this.setToken(getTokenFromString(event.data), !!document.querySelector('#login-cbx:checked'))
               .then(user => resolve(user))
               .catch(err => reject());
         }
@@ -126,7 +134,7 @@ export class GitHubAPI implements GitHubAPIInterface {
 
         // open the popup
         const githubWindow = window.open(
-            `https://github.com/login/oauth/authorize?client_id=${process.env.REDACTED_GITHUB_CLIENT_ID}&redirect_uri=http://localhost:3000/callback`, 
+            `https://github.com/login/oauth/authorize?client_id=${process.env.REDACTED_GITHUB_CLIENT_ID}&scope=user%20public_repo&redirect_uri=http://localhost:3000/callback`, 
             'GitHubLogin',
             'menubar=no,location=yes,resizable=yes,status=yes,width=786,height=534'
         );

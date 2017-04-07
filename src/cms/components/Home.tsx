@@ -3,29 +3,74 @@ import createElement from 'inferno-create-element';
 import { linkEvent } from 'inferno';
 import { Posts } from './Posts';
 import { AppService } from '../services/App';
-import { PostsService } from '../services/Posts';
+
+// handle click to fork repo
+function forkRepo() {
+    const { context, setState } = this.data;
+
+    context.api.forkRepo({ owner: 'galaksi', repo: 'fuusio' })
+        .then(res => {
+            setState.call(this.data, { hasBaseRepo: true });
+        })
+        .catch(err => console.log('error: forking base repo', err));
+}
+
+// handle click of create new post
+function createPost({ context }) {
+    context.store.updateState({ route: 'new-post' });
+}
 
 // Home Screen with Auth
 export class Home extends Component<any, any> {
 	constructor(props, context?: any) {
 		super(props, context);
+        this.state = {
+            hasBaseRepo: false,
+            hasFetched: false
+        }
 	}
 
     componentDidMount() {
-      // when home mounts we need to fetch posts and the user deets
-      // we should then call the store to update the state
-      Promise.all([AppService.getPosts()])
+      // when home mounts we need to fetch user deets
+      // also, need to check for existence of the base repo
+      // if it is there, set hasBaseRepo to true, otherwise
+      // will display button for user to set it all up which
+      // will create the fork and allow user to start creating posts!
+      this.context.api.getRepo('fuusio')
         .then(res => {
-            // update store!
-            this.context.store.updateState({ posts: res[0] });
+            this.setState({
+                hasFetched: true,
+                hasBaseRepo: (res && res.message !== 'Not Found') ? true : false,
+            });
         });
     }
 
 	render() {
+        const { hasFetched, hasBaseRepo } = this.state
         return (
             <div className="col-lg-12" id="index">
-                <span className="title">Welcome Home</span><br />
-                <Posts posts={this.context.store.getState().posts} editPost={linkEvent(this.context.store, PostsService.editPost)} />
+                {
+                    hasFetched ? 
+                        hasBaseRepo
+                            ? (
+                                <a className="ghost-btn purple" onClick={linkEvent(this, createPost)}>
+                                <span>Create New Post</span>
+                                </a>
+                            )
+                            : (
+                                <div>
+                                    <span className="title">Welcome Home</span><br />
+                                    First things first! We'll need to fork the base blog repo over to your account.<br />
+                                    From there, all new posts you create will live under this newly forked repo.
+                                    <br /><br />
+                                    <a className="ghost-btn purple" onClick={linkEvent(this, forkRepo)}>
+                                        <span>Let's Go! Create the Blog Repo! <i className="fa fa-github"></i></span>
+                                    </a>
+                                </div>
+                            )
+                    : null
+                }
+
             </div>
         );
 	}
