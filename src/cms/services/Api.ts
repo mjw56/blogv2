@@ -2,6 +2,7 @@ import { GitHubAPI } from './GitHub';
 
 interface APIInterface {
   hasToken(): boolean;
+  getToken(): string;
 }
 
 /**
@@ -21,5 +22,9 @@ export class API extends GitHubAPI implements APIInterface {
   // check if token is present
   hasToken(): boolean {
     return typeof this.access_token === 'string' && this.access_token !== '';
+  }
+
+  getToken() {
+    return this.access_token;
   }
 }

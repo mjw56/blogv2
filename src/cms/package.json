@@ -25,6 +25,6 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "start": "node server.js"
+    "start": "node server"
   }
 }

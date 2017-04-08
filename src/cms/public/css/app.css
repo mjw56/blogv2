@@ -9,6 +9,7 @@ body {
   color: #fff;
   font-family: Helvetica Neue;
   font-weight: 100;
+  letter-spacing: 0.5px;
 }
 
 #root, #container {
@@ -65,7 +66,7 @@ body {
   opacity: 0.85;
 }
 
-.content.login {
+.content.login, .content.index {
     height: 70%;
     display: grid;
     align-items: center;

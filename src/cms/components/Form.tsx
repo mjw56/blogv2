@@ -3,14 +3,44 @@ import createElement from 'inferno-create-element';
 import { linkEvent } from 'inferno';
 import { FormService } from '../services/Form';
 
+function wut({ store, route }) {
+    store.updateState({ route });
+}
+
+// store any image uploads until submission
+function imageSelection(t) {
+    t.formService.previewFile(function(file, content) {
+        t.media.push({
+            name: file.name,
+            content
+        });
+    });
+}
+
+// submit the form
+function formSubmission(t, event) {
+    t.formService.submit(
+        {
+            token: t.context.api.getToken(),
+            state: t.context.store.getState(),
+            media: t.media
+        }, 
+        event
+    )
+    .then(res => {
+        t.context.store.updateState({ route: 'index' });
+    });
+}
+
 // Generic Form
 // TODO: Split into New/Edit
 export class Form extends Component<any, any> {
     formService;
+    media = [];
 
 	constructor(props, context?: any) {
 		super(props, context);
-        this.formService = FormService(context.store);
+        this.formService = FormService();
 	}
 
     componentDidMount() {
@@ -19,11 +49,13 @@ export class Form extends Component<any, any> {
 
     componentWillUnmount() {
         this.formService.formUnmount();
+        this.formService = null;
+        this.media = null;
     }
 
 	render() {
         const state = this.context.store.getState();
-        const { router, store } = this.context;
+        const { api, router, store } = this.context;
         return (
             <div>
                 <div className="col-lg-7" id="new-post">
@@ -54,11 +86,11 @@ export class Form extends Component<any, any> {
                             <div className="form-group">
                                 <label className="col-sm-2 col-sm-2 control-label">Cover Photo</label>
                                 <div className="col-sm-10">
-                                    <input type="file" className="form-control" name="file" id="file" onChange={this.formService.previewFile} />
+                                    <input type="file" className="form-control" name="file" id="file" onChange={linkEvent(this, imageSelection)} />
                                     <img src="" alt="Image preview..." id="file-preview" name="file-preview" />
                                 </div>
                             </div>
-                            <a class="ghost-btn purple" id="submit-btn" onClick={linkEvent({ router, store }, this.formService.submit)}>
+                            <a class="ghost-btn purple" id="submit-btn" onClick={linkEvent(this, formSubmission)}>
                                 <span>
                                     { (state.route === 'new-post') ? `Submit` : `Save`}
                                 </span>

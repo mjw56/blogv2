@@ -6,7 +6,7 @@ import { HeaderNonAuth } from './Header.NonAuth';
 // TODO: handle auth/no-auth
 export const Header = ({ auth }, { store }) => (
     <header className="header black-bg">
-        <a href="index.html" className="circle"></a>
+        <a className="circle"></a>
         { auth ? <HeaderAuth avatar={store.getState().user.avatar_url}/> : <HeaderNonAuth /> }
     </header>
 );
