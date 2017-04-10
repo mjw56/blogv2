@@ -184,7 +184,7 @@ function multiFileCommit(options) {
               sha: blobs[index].sha
             };
           }),
-          basetree: tree.sha
+          base_tree: tree.sha
         });
       });
     }).then(function(tree) {
