@@ -6,8 +6,10 @@ const aws = require('aws-sdk');
 const database = require('../../database');
 const path = require('path');
 const sockets = require('../services/Sockets');
-const { createFile, getFile, updateFile } = require('./github');
-const { getHTMLForPost, getDateNow, pad } = require('./helpers');
+const { createFile, getFile, updateFile, multiFileCommit } = require('./github');
+const { getHTMLFor, getDateNow, pad } = require('./helpers');
+const showdown = require('showdown');
+const converter = new showdown.Converter();
 
 const port = 3000;
 
@@ -55,43 +57,84 @@ app.get('/sign-s3', function(req, res) {
 app.post('/save-post', function(req, res) {
     // when saving post we'll first need to get
     // the config file which will be updated
-    const { user, deets } = req.body;
+    const { user, deets, token } = req.body;
 
-    getFile(req.body.user.login, 'fuusio', '_config.json')
-        .then((resp) => {
-            try {
-                // create all the files!
-                // req.body.media.forEach(m => {
-                //     createFile(req.body.user.login, 'fuusio', `media/${m.name}`, 'test image', m.content, req.body.token)
-                //         .then(res => console.log('success!'));
-                // });
+    let promises = [];
 
-                const content = JSON.parse(new Buffer(resp.content, 'base64').toString());
-                const slug = `${getDateNow()}-${deets.title.replace(/[^a-zA-Z ]/g, "").toLowerCase().split(' ').join('-')}`;
+    Promise.all([
+        getFile(user.login, 'fuusio', 'config.json'),
+        getFile(user.login, 'fuusio', 'index.html')
+    ])
+    .then(([configFile, indexFile]) => {
+        try {
+            // decode the config file from base 64
+            const config = JSON.parse(new Buffer(configFile.content, 'base64').toString());
+            
+            // create the slug that will be the identifier
+            const slug = `${getDateNow()}-${deets.title.replace(/[^a-zA-Z ]/g, "").toLowerCase().split(' ').join('-')}`;
 
-                content.posts[slug] = { title: deets.title, slug: slug };
+            // update config for the new slug with deets
+            config.posts[slug] = { title: deets.title, slug: slug };
 
-                // get new html file
-                const file = getHTMLForPost(deets, user);
+            // get list of slugs, and for each one construct title/route
+            const postKeys = Object.keys(config.posts).sort().reverse();
+            const postsForIndex = postKeys.map(slug => ({ 
+                title: config.posts[slug].title,
+                route: `_posts/${slug}/index.html`
+            }));
 
-                // TODO: this should write the following files:
-                // 1) the new post file
-                // 2) the post .md file
-                // 3) the updated config file with new post
-                // 4) the main index page with new post link
+            // construct post html file
+            const postHTML = getHTMLFor(
+                path.join( __dirname, '_post.html'),
+                {
+                    author: user.name,
+                    title: deets.title,
+                    body: converter.makeHtml(deets.content)
+                }
+            );
 
+            // construct post html file
+            const indexHTML = getHTMLFor(
+                path.join( __dirname, '_index.html'),
+                {
+                    author: user.name,
+                    title: config.title,
+                    posts: postsForIndex
+                }
+            );
+
+            const api = multiFileCommit({
+                username: user.login,
+                token,
+                reponame: 'fuusio'
+            });
+
+            api.commit(
+                [
+                    {
+                        path: `drafts/${slug}/index.md`,
+                        content: JSON.stringify(deets.content)
+                    }, {
+                        path: `posts/${slug}/index.html`,
+                        content: postHTML
+                    },
+                    {
+                        path: 'index.html',
+                        content: indexHTML
+                    }, {
+                        path: 'config.json',
+                        content: JSON.stringify(config,  null, "\t")
+                    },
+                ], 
+                'test commit via api'
+            ).then(_ => {
+                console.log('success!');
                 res.end();
-
-                // update config file with new deets if any
-                // updateFile(req.body.user.login, 'fuusio', '_config.json', 'update', new Buffer(JSON.stringify(content)).toString('base64'), resp.sha, req.body.token)
-                //     .then(function() {
-                //         console.log('config updated successfully!');
-                //         res.send();
-                //     });
-            } catch (e) {
-                console.error('Failed to parse file contents', e);
-            }
-        });
+            });
+        } catch (e) {
+            console.error('Failed to save new post', e);
+        }
+    });
 });
 
 // saves post into mLab

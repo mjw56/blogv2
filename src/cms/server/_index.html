@@ -9,22 +9,31 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="white">
 
     <title>{{title}}</title>
-
-    <link rel="stylesheet" href="../style.css">
+    
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <header role="banner">
-      <a href="/">< Home</a>
+      <h1>{{title}}</h1>
     </header>
 
     <main role="main">
-      <article role="article">
-        <h1>{{title}}</h1>
-
-        <section aria-live="assertive" aria-atomic="true">
-          {{{body}}}
-        </section>
-      </article>
+      <section>
+        <ul>
+          {{#each posts}}
+            <li onclick="goTo('{{this.route}}')" role="link">
+              {{this.title}}
+            </li>
+          {{/each}}
+        </ul>
+      </section>
     </main>
+
+    <script>
+      function goTo(route) {
+        window.location = `${window.location.href}/${route}`;
+      }
+    </script>
   </body>
 </html>

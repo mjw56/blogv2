@@ -4,16 +4,10 @@ const handlebars = require('handlebars');
 const showdown = require('showdown');
 const converter = new showdown.Converter();
 
-// returns HTML markup for given Markdown content
-// and injects it into an html file shell
-function getHTMLForPost(deets, user) {
-    const base = fs.readFileSync(path.join( __dirname, '_post.html'), 'utf8');
-
-    const context = {
-        author: user.name,
-        body: converter.makeHtml(deets.content),
-        title: deets.title
-    };
+// Return an HTML template for the
+// given file path and context provided
+function getHTMLFor(path, context) {
+    const base = fs.readFileSync(path, 'utf8');
 
     const template = handlebars.compile(base);
     const html = template(context);
@@ -34,7 +28,7 @@ function getDateNow() {
 }
 
 module.exports = {
-  getHTMLForPost,
+  getHTMLFor,
   pad,
   getDateNow
 };
