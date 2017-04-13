@@ -1,1 +1,0 @@
-The CMS will be responsible for gathering all the input data for a new post.

@@ -9,11 +9,11 @@ const replace = require('rollup-plugin-replace');
 
 module.exports = {
     format: 'cjs',
-    entry: "./index.tsx",
+    entry: "./src/index.tsx",
     dest: 'public/bundle.js',
     plugins: [
     	replace({
-    	    'process.env.NODE_ENV': JSON.stringify( 'development' ),
+    	    'process.env.NODE_ENV': JSON.stringify( 'production' ),
             'process.env.REDACTED_GITHUB_CLIENT_ID': JSON.stringify( `${process.env.REDACTED_GITHUB_CLIENT_ID}` )
     	}),
         typescript({
@@ -31,6 +31,6 @@ module.exports = {
     	nodeResolve({
     	    module: true,
         }),
-        uglify()
+        // uglify()
     ]
 };
