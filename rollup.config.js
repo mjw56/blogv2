@@ -33,6 +33,6 @@ module.exports = {
     nodeResolve({
       module: true
     })
-    // uglify()
+    uglify()
   ]
 };
