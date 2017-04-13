@@ -1,6 +1,4 @@
-import createElement from 'inferno-create-element';
+import createElement from "inferno-create-element";
 
 // Auth Header
-export const HeaderNonAuth = ({ auth }, { router }) => (
-  <span></span>
-);
+export const HeaderNonAuth = ({ auth }, { router }) => <span />;

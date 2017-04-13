@@ -1,5 +1,5 @@
-const WebSocket = require('ws');
-const showdown = require('showdown');
+const WebSocket = require("ws");
+const showdown = require("showdown");
 const converter = new showdown.Converter();
 
 // Sockets Service
@@ -7,32 +7,32 @@ const converter = new showdown.Converter();
 
 // handle message from the server
 function handleMessage(ws, message) {
-    let parsedMessage;
-    try {
-        parsedMessage = JSON.parse(message);
-    } catch (e) {
-        console.error(e);
-    }
+  let parsedMessage;
+  try {
+    parsedMessage = JSON.parse(message);
+  } catch (e) {
+    console.error(e);
+  }
 
-    const html = converter.makeHtml(parsedMessage.content);
+  const html = converter.makeHtml(parsedMessage.content);
 
-    ws.send(html);
+  ws.send(html);
 }
 
 // setup listeners on connection
 function connection(ws) {
-    ws.on('message', handleMessage.bind(null, ws));
+  ws.on("message", handleMessage.bind(null, ws));
 
-    ws.on('close', function close() { });
+  ws.on("close", function close() {});
 }
 
 // init the web socket connection to server
 function init(server) {
-    const wss = new WebSocket.Server({ server });
+  const wss = new WebSocket.Server({ server });
 
-    wss.on('connection', connection);
+  wss.on("connection", connection);
 }
 
 module.exports = {
-    init: init
-}
+  init: init
+};

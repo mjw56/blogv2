@@ -1,16 +1,16 @@
-import { createCookie, readCookie, eraseCookie } from './Cookies';
-import { getTokenFromString } from './Misc';
+import { createCookie, readCookie, eraseCookie } from "./Cookies";
+import { getTokenFromString } from "./Misc";
 
 interface GitHubAPIInterface {
-  setToken(token: string, rememberMe?: boolean): Promise<Object>;
-  eraseToken(): void;
-  getUser(): Object;
-  getRepo(repo: string): Promise<Object>;
-  forkRepo(Object: { owner: string, repo: string }): Promise<Object>;
-  setUser(): Promise<Object>;
-  getHeaders(input: { headers?: Object }): Object;
-  request(path: string, options?: Object): Promise<Object>;
-  login(rememberMe: boolean): Promise<Object>;
+  setToken(token: string, rememberMe?: boolean): Promise<Object>,
+  eraseToken(): void,
+  getUser(): Object,
+  getRepo(repo: string): Promise<Object>,
+  forkRepo(Object: { owner: string, repo: string }): Promise<Object>,
+  setUser(): Promise<Object>,
+  getHeaders(input: { headers?: Object }): Object,
+  request(path: string, options?: Object): Promise<Object>,
+  login(rememberMe: boolean): Promise<Object>
 }
 
 /**
@@ -20,7 +20,7 @@ interface GitHubAPIInterface {
  * endpoint, _the MainAPI extends this class_
  */
 export class GitHubAPI implements GitHubAPIInterface {
-  COOKIE_KEY = 'redacted';
+  COOKIE_KEY = "redacted";
   access_token;
   user;
   base_url;
@@ -28,7 +28,7 @@ export class GitHubAPI implements GitHubAPIInterface {
   constructor(config) {
     this.access_token = config.access_token;
     this.user = config.user;
-    this.base_url = 'https://api.github.com';
+    this.base_url = "https://api.github.com";
   }
 
   // set the token and instantiate github api
@@ -39,9 +39,7 @@ export class GitHubAPI implements GitHubAPIInterface {
         createCookie(this.COOKIE_KEY, this.access_token);
       }
 
-      this.setUser()
-        .then(user => resolve(user))
-        .catch(err => reject(err));
+      this.setUser().then(user => resolve(user)).catch(err => reject(err));
     });
   }
 
@@ -62,12 +60,12 @@ export class GitHubAPI implements GitHubAPIInterface {
 
   // fork a repo
   forkRepo({ owner, repo }) {
-    return this.request(`/repos/${owner}/${repo}/forks`, { method: 'POST' });
+    return this.request(`/repos/${owner}/${repo}/forks`, { method: "POST" });
   }
 
   setUser() {
-    return this.request('/user')
-      .then(user => { 
+    return this.request("/user")
+      .then(user => {
         this.user = user;
         return user;
       })
@@ -77,21 +75,23 @@ export class GitHubAPI implements GitHubAPIInterface {
   getHeaders({ headers = {} }) {
     const options = {
       "Content-Type": "application/json",
-      ...headers,
+      ...headers
     };
 
     if (this.access_token) {
       return {
         ...options,
-        Authorization: `token ${ this.access_token }`,
+        Authorization: `token ${this.access_token}`
       };
     }
 
     return options;
   }
 
-  request(path: string = '', options = {}) {
-    const assembledPath = this.user ? path.replace(':username', this.user.login) : path;
+  request(path: string = "", options = {}) {
+    const assembledPath = this.user
+      ? path.replace(":username", this.user.login)
+      : path;
 
     return new Promise((resolve, reject) => {
       const headers = this.getHeaders({});
@@ -103,41 +103,44 @@ export class GitHubAPI implements GitHubAPIInterface {
   }
 
   // handle opening new window for github oauth login
-  // and hearing message back from that window with the 
+  // and hearing message back from that window with the
   // github access_token. the popup is responsible
   // for the token handshake through the callback param
   // provided which directs to the server and then responds
-  // with the access_token which is relayed back to parent window 
+  // with the access_token which is relayed back to parent window
   login() {
     return new Promise((resolve, reject) => {
-        // handle messages received from popup window
-        const receiveMessage = (event) => {
-            // Do we trust the sender of this message?
-            if (event.origin !== window.location.origin) {
-                return;
-            }
-
-            // remove the listener as we should only receive one message
-            window.removeEventListener('message', receiveMessage, false);
-
-            // close the window
-            githubWindow.close();
-
-            // set token and get user deets once, resolve these deets back to caller
-            this.setToken(getTokenFromString(event.data), !!document.querySelector('#login-cbx:checked'))
-              .then(user => resolve(user))
-              .catch(err => reject());
+      // handle messages received from popup window
+      const receiveMessage = event => {
+        // Do we trust the sender of this message?
+        if (event.origin !== window.location.origin) {
+          return;
         }
 
-        // listen for messages back from popup
-        window.addEventListener("message", receiveMessage, false);
+        // remove the listener as we should only receive one message
+        window.removeEventListener("message", receiveMessage, false);
 
-        // open the popup
-        const githubWindow = window.open(
-            `https://github.com/login/oauth/authorize?client_id=${process.env.REDACTED_GITHUB_CLIENT_ID}&scope=user%20public_repo&redirect_uri=http://localhost:3000/callback`, 
-            'GitHubLogin',
-            'menubar=no,location=yes,resizable=yes,status=yes,width=786,height=534'
-        );
+        // close the window
+        githubWindow.close();
+
+        // set token and get user deets once, resolve these deets back to caller
+        this.setToken(
+          getTokenFromString(event.data),
+          !!document.querySelector("#login-cbx:checked")
+        )
+          .then(user => resolve(user))
+          .catch(err => reject());
+      };
+
+      // listen for messages back from popup
+      window.addEventListener("message", receiveMessage, false);
+
+      // open the popup
+      const githubWindow = window.open(
+        `https://github.com/login/oauth/authorize?client_id=${process.env.REDACTED_GITHUB_CLIENT_ID}&scope=user%20public_repo&redirect_uri=http://localhost:3000/callback`,
+        "GitHubLogin",
+        "menubar=no,location=yes,resizable=yes,status=yes,width=786,height=534"
+      );
     });
   }
 }

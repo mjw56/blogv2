@@ -1,8 +1,8 @@
-import { GitHubAPI } from './GitHub';
+import { GitHubAPI } from "./GitHub";
 
 interface APIInterface {
-  hasToken(): boolean;
-  getToken(): string;
+  hasToken(): boolean,
+  getToken(): string
 }
 
 /**
@@ -21,7 +21,7 @@ export class API extends GitHubAPI implements APIInterface {
 
   // check if token is present
   hasToken(): boolean {
-    return typeof this.access_token === 'string' && this.access_token !== '';
+    return typeof this.access_token === "string" && this.access_token !== "";
   }
 
   getToken() {
@@ -31,19 +31,18 @@ export class API extends GitHubAPI implements APIInterface {
   post(route, data) {
     return new Promise((resolve, reject) => {
       const myHeaders = new Headers();
-      myHeaders.append('Content-Type', 'application/json');
-      
+      myHeaders.append("Content-Type", "application/json");
+
       fetch(route, {
-          method: 'POST',
-          headers: myHeaders,
-          body: JSON.stringify(data)
-      })
-      .then(res => {
-          if (res && res.status === 200) {
-            resolve();
-          } else {
-            reject('POST CONTENT SAVE FAILURE');
-          }
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify(data)
+      }).then(res => {
+        if (res && res.status === 200) {
+          resolve();
+        } else {
+          reject("POST CONTENT SAVE FAILURE");
+        }
       });
     });
   }

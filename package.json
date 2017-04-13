@@ -18,6 +18,7 @@
   "devDependencies": {
     "babel-plugin-inferno": "^3.2.0",
     "babel-preset-es2015-rollup": "^3.0.0",
+    "prettier": "^1.0.2",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-commonjs": "^8.0.2",
@@ -29,6 +30,7 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "prettify": "prettier --write ./src/**/*.{js,ts,tsx}",
     "start": "node src/server"
   }
 }

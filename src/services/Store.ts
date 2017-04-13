@@ -1,9 +1,9 @@
 // store interface
 interface Store {
-  subscribe(Function): void;
-  unsubscribe(Function): void;
-  getState(): Object;
-  updateState(Object): void;
+  subscribe(Function): void,
+  unsubscribe(Function): void,
+  getState(): Object,
+  updateState(Object): void
 }
 
 // Store Service
@@ -15,12 +15,12 @@ export function createStore(initialState = {}): Store {
   let subscriptions = [];
 
   // register a subscription from a component
-  const subscribe = (listener) => {
+  const subscribe = listener => {
     subscriptions.push(listener);
   };
 
   // de-register a listening component
-  const unsubscribe = (listener) => {
+  const unsubscribe = listener => {
     subscriptions.splice(subscriptions.indexOf(listener), 1);
   };
 
@@ -42,6 +42,6 @@ export function createStore(initialState = {}): Store {
     subscribe,
     unsubscribe,
     getState,
-    updateState,
+    updateState
   };
 }
