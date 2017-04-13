@@ -10,7 +10,7 @@ const replace = require('rollup-plugin-replace');
 module.exports = {
     format: 'cjs',
     entry: "./src/index.tsx",
-    dest: 'public/bundle.js',
+    dest: './src/public/bundle.js',
     plugins: [
     	replace({
     	    'process.env.NODE_ENV': JSON.stringify( 'production' ),
