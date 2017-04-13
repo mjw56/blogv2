@@ -92,52 +92,14 @@ label[for=login-cbx] {
   display: flex;
 }
 
-.post-list {
-  display: table;
-  width: 100%;
-  margin-top: 60px;
+.posts-list li {
+  list-style: none;
+  font-size: 20px;
 }
 
-.post-list .desc {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    vertical-align: middle;
-    padding: auto;
-    padding: 15px;
-    border-top: 1px solid white;
-    font-size: 16px;
-}
-
-.post-list:last-child {
-  border-bottom: 1px solid white;
-}
-
-.post-list .desc *:not(:last-child) {
-  margin-bottom: 5px;
-}
-
-.post-list .desc .badge {
-  background: transparent;
-  font-size: 34px;
-}
-
-.post-list .desc .badge.edit:hover {
+.posts-list li:hover {
   cursor: pointer;
   opacity: 0.85;
-}
-
-.post-list .desc .details {
-  font-size: 34px;
-}
-
-.post-list .desc .details p {
-    display: inline-block;
-    margin-right: 15px;
-}
-
-.post-list .desc .details a {
-  color: white;
 }
 
 .form-header {
@@ -203,7 +165,7 @@ label[for=login-cbx] {
 }
 
 .content {
-  margin-left: 0;
+  margin: 25px 0 0 0;
 }
 
 .ghost-btn {

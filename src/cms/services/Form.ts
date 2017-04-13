@@ -6,76 +6,46 @@ import { fileIsAnImage, signS3 } from './Misc';
 export function FormService() {
     let formWS = null;
 
-    // this calls s3 to upload the file with the signed request
-    function uploadFile(file, signedRequest, url){
-        return new Promise(function(resolve, reject) {
-            const xhr = new XMLHttpRequest();
-            xhr.open('PUT', signedRequest);
-            xhr.onreadystatechange = () => {
-                if(xhr.readyState === 4){
-                    if(xhr.status === 200) {
-                        resolve();
-                    }
-                    else{
-                        reject();
-                    }
-                }
-            };
-            xhr.send(file);
-        });
-    }
+    // get image that was uploaded via dialog
+    function getImage(id) {
+        return new Promise((resolve, reject) => {
+            var file = document.getElementById(id).files[0];
+            var reader = new FileReader();
 
-    // this will populate the image preview dialog
-    // after user has selected a file to upload
-    function previewFile(cb) {
-        var preview = document.getElementById('file-preview');
-        var file = document.getElementById('file').files[0];
-        var reader = new FileReader();
-
-        if (!file) {
-            console.log('no file selected');
-            return;
-        }
-
-        if (file && fileIsAnImage(file.name)) {
-            reader.readAsDataURL(file);
-
-            function onLoad() {
-                let content = reader.result;
-
-                // load image into DOM
-                preview.src = content;
-
-                content = content.replace(/^(.+,)/, '');
-
-                if (typeof cb === 'function') {
-                    cb(file, content);
-                }
-
-                reader.removeEventListener('load', onLoad, false);
+            if (!file) {
+                console.log('no file selected');
+                return;
             }
 
-            const listener = reader.addEventListener('load', onLoad, false);
-        }
+            if (file && fileIsAnImage(file.name)) {
+                reader.readAsDataURL(file);
+
+                function onLoad() {
+                    reader.removeEventListener('load', onLoad, false);
+
+                    resolve({ file, content: reader.result });
+                }
+
+                const listener = reader.addEventListener('load', onLoad, false);
+            }
+        });
     }
 
     // when form mounts, boot up the web socket
     function formMount(state) {
-        formWS = new WebSocket(`ws://${location.host}`);
-        formWS.onerror = () => console.log('WebSocket error');
-        // formWS.onopen = () => {
-        //     console.log('WebSocket connection established');
+        return new Promise((resolve, reject) => {
+            formWS = new WebSocket(`ws://${location.host}`);
+            formWS.onerror = () => console.log('WebSocket error');
+            formWS.onopen = () => {
+                console.log('WebSocket is opened');
+                resolve();
+            };
+            formWS.onclose = () => console.log('WebSocket connection closed');
 
-        //     // check the route, are we on edit?
-        //     if (state.route === 'edit-post') {
-        //         formWS.send(JSON.stringify({ content: document.getElementById('content').value }));
-        //     }
-        // };
-        formWS.onclose = () => console.log('WebSocket connection closed');
-
-        formWS.onmessage = (msg) => {
-            document.getElementById('post-preview').innerHTML = msg.data;
-        }
+            formWS.onmessage = (msg) => {
+                document.getElementById('post-preview').innerHTML = msg.data;
+            }
+        });
     }
 
     // when form unmounts, destroy the web socket
@@ -85,40 +55,13 @@ export function FormService() {
     }
 
     // listen for when the textarea has been updated
+    // this sends the content over the socket
     function changeEventHandler(event) {
         formWS.send(JSON.stringify({ content: event.target.value }));
     }
 
-    // handle uploading of an image into the form content
-    function handleImageSelection() {
-        var file = document.getElementById('uploadImage').files[0];
-        var reader = new FileReader();
-
-        if (!file) {
-            console.log('no file selected');
-            return;
-        }
-
-        if (file && fileIsAnImage(file.name)) {
-            reader.readAsDataURL(file);
-
-            // get signature for upload to s3
-            signS3(file).then(res => {
-                uploadFile(file, res.signedRequest, res.url).then(function() {
-                    const content = document.getElementById('content').value;
-                    const newContent = (content !== '')
-                        ? `${content}\n![${file.name}](${res.url})`
-                        : `![${file.name}](${res.url})`;
-
-                    document.getElementById('content').value = newContent;
-                    formWS.send(JSON.stringify({ content: document.getElementById('content').value }));
-                });
-            });
-        }
-    }
-
     // handle the submission of the form
-    function submit({ state, token, media }, event) {
+    function submit({ state, token, cover }, event) {
         return new Promise((resolve, reject) => {
             // prevent the default browser form behavior, we'll handle it
             event.preventDefault();
@@ -129,7 +72,8 @@ export function FormService() {
             let route = '';
             let data = {};
 
-            if (state.route === 'new-post') {
+            // check the state of postToEdit
+            if (!state.postToEdit) {
                 route = 'save-post';
                 data = {
                     deets: {
@@ -137,7 +81,7 @@ export function FormService() {
                         'content': document.getElementById('content').value
                     },
                     token,
-                    media,
+                    cover,
                     user: {
                         login: state.user.login,
                         name: state.user.name
@@ -145,20 +89,18 @@ export function FormService() {
                 };
             } else {
                 route = 'update-post';
-                const _id = document.getElementById('post-form').attributes['data-id'].nodeValue;
-
-                const post = state.posts.find(p => p._id === _id);
 
                 data = {
-                    _id: post._id,
+                    post: state.postToEdit,
                     deets: {
                         'title': document.getElementById('title').value,
                         'content': document.getElementById('content').value
                     },
-                    timestamp: post.timestamp,
                     token,
-                    media,
-                    user: state.user.login
+                    user: {
+                        login: state.user.login,
+                        name: state.user.name
+                    }
                 };
             }
 
@@ -216,7 +158,7 @@ export function FormService() {
                 document.getElementById('delete-btn').classList.add('green');
 
                 setTimeout(function() {
-                    router.go('index');
+                    store.updateState({ route: 'index' });
                 }, 2500);
             } else {
                 console.log('DELETE FAILURE');
@@ -228,8 +170,7 @@ export function FormService() {
         formMount,
         formUnmount,
         changeEventHandler,
-        handleImageSelection,
-        previewFile,
+        getImage,
         deletePost,
         submit
     }

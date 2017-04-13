@@ -1,26 +1,54 @@
+import Component from 'inferno-component';
 import createElement from 'inferno-create-element';
-import { timeDifference } from '../services/Misc';
+import { linkEvent } from 'inferno';
 
-// List of Posts in DB
-export const Posts = ({ posts = [], editPost }) => (
-    <div className="post-list">
-        {
-            posts.slice().reverse().map(post => (
-                <div className="desc">
-                  <div className="thumb left">
-                      <span className="badge bg-theme"><i className="fa fa-clock-o"></i></span>
-                      <muted>{timeDifference(Date.now(), post.timestamp)}</muted>
-                  </div>
-                  <div className="details">
-                    <p>
-                      <a>{post.deets.title}</a><br/>
-                    </p>
-                    <span className="badge bg-theme edit">
-                        <i className="fa fa-edit" onClick={editPost} data-id={post.timestamp}></i>
-                    </span>
-                  </div>
-                </div>
-            ))
+function handlePostClick({ post, store }) {
+    store.updateState({ route: 'post', postToEdit: post });
+}
+
+// Posts
+export class Posts extends Component<any, any> {
+    constructor() {
+        super();
+        this.state = {
+            haveConfig: false,
+            posts: []
         }
-    </div>
-);
+    }
+
+    componentDidMount() {
+        // grab config which has post slugs
+        this.context.api.request('/repos/:username/fuusio/contents/config.json')
+            .then(res => {
+                try {
+                    const config = JSON.parse(window.atob(res.content));
+
+                    this.setState({
+                        haveConfig: true,
+                        config,
+                        posts: Object.keys(config.posts)
+                    });  
+                } catch(e) {
+                    console.log('Posts Component: there was an error parsing the config', e);
+                }
+            });
+    }
+
+    render() {
+        const { haveConfig, config, posts } = this.state;
+        const { store } = this.context;
+        return (
+            <div className="posts-list">
+                {
+                    haveConfig 
+                        ? posts.length ? (<ul>{posts.map(slug => (
+                            <li 
+                              onClick={linkEvent({ post: config.posts[slug], store }, handlePostClick)}
+                            >{config.posts[slug].title}</li>
+                        ))}</ul>) : null
+                        : null
+                }
+            </div>
+        )
+    }
+}

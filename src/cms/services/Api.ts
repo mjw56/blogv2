@@ -27,4 +27,24 @@ export class API extends GitHubAPI implements APIInterface {
   getToken() {
     return this.access_token;
   }
+
+  post(route, data) {
+    return new Promise((resolve, reject) => {
+      const myHeaders = new Headers();
+      myHeaders.append('Content-Type', 'application/json');
+      
+      fetch(route, {
+          method: 'POST',
+          headers: myHeaders,
+          body: JSON.stringify(data)
+      })
+      .then(res => {
+          if (res && res.status === 200) {
+            resolve();
+          } else {
+            reject('POST CONTENT SAVE FAILURE');
+          }
+      });
+    });
+  }
 }

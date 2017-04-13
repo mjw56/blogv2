@@ -3,18 +3,46 @@ import createElement from 'inferno-create-element';
 import { linkEvent } from 'inferno';
 import { FormService } from '../services/Form';
 
-function wut({ store, route }) {
-    store.updateState({ route });
+// store any image uploads until submission
+function imageSelectionForCover(t) {
+    t.formService.getImage('cover-image')
+        .then(({ file, content }) => {
+            document.getElementById('file-preview').src = content;
+            const { user } = t.context.store.getState();
+
+            t.context.api.post('add-image', {
+                name: file.name,
+                content: content.replace(/^(.+,)/, ''),
+                token: t.context.api.getToken(),
+                owner: user.login
+            })
+            .then(res => {
+                t.cover = file.name;
+            });
+        });
 }
 
-// store any image uploads until submission
-function imageSelection(t) {
-    t.formService.previewFile(function(file, content) {
-        t.media.push({
-            name: file.name,
-            content
+function imageSelectionForPostBody(t) {
+    t.formService.getImage('post-image')
+        .then(({ file, content }) => {
+            const { user } = t.context.store.getState();
+
+            t.context.api.post('add-image', {
+                name: file.name,
+                content: content.replace(/^(.+,)/, ''),
+                token: t.context.api.getToken(),
+                owner: user.login
+            })
+            .then(res => {
+                const content = document.getElementById('content').value;
+
+                if (content === '') {
+                    document.getElementById('content').value = `![${file.name}](../../media/${file.name})`;
+                } else {
+                    document.getElementById('content').value = `${content}\n\n![${file.name}](../../media/${file.name})`;
+                }
+            });
         });
-    });
 }
 
 // submit the form
@@ -23,7 +51,7 @@ function formSubmission(t, event) {
         {
             token: t.context.api.getToken(),
             state: t.context.store.getState(),
-            media: t.media
+            cover: t.cover
         }, 
         event
     )
@@ -32,11 +60,15 @@ function formSubmission(t, event) {
     });
 }
 
+function closeForm(store) {
+    store.updateState({ route: 'index', postToEdit: null });
+}
+
 // Generic Form
 // TODO: Split into New/Edit
 export class Form extends Component<any, any> {
     formService;
-    media = [];
+    cover = '';
 
 	constructor(props, context?: any) {
 		super(props, context);
@@ -44,13 +76,35 @@ export class Form extends Component<any, any> {
 	}
 
     componentDidMount() {
-        this.formService.formMount();
+        const state = this.context.store.getState();
+        this.formService.formMount(this.context.store.getState())
+            .then(() => {
+                // check post details, go fetch if necessary
+                if (state.postToEdit) {
+                    Promise.all([
+                        this.context.api.request('/repos/:username/fuusio/contents/config.json'),
+                        this.context.api.request(`/repos/:username/fuusio/contents/drafts/${state.postToEdit.slug}/index.md`)
+                    ])
+                    .then(([config, post]) => {
+                        try {
+                            const parsedConfig = JSON.parse(atob(config.content));
+                            const parsedPost = JSON.parse(atob(post.content));
+
+                            document.getElementById('title').value = parsedConfig.posts[state.postToEdit.slug].title;
+                            document.getElementById('content').value = parsedPost
+                        } catch(e) {
+                            console.log('failed to parse post title and contents for edit', e);
+                        }
+                    })
+                    .catch(e => console.log('failed to fetch details for post to edit'));
+                }
+            })
+            .catch(e => console.log('failed to mount form'));
     }
 
     componentWillUnmount() {
         this.formService.formUnmount();
         this.formService = null;
-        this.media = null;
     }
 
 	render() {
@@ -62,7 +116,7 @@ export class Form extends Component<any, any> {
                     <div className="form-panel">
                         <div className="form-header">
                             <h4 className="mb"><i className="fa fa-angle-right"></i> { (state.route === 'new-post') ? `New Post` : `Edit Post`}</h4>
-                            <h4 className="close" onClick={linkEvent('index', router.go)}>X</h4>
+                            <h4 className="close" onClick={linkEvent(store, closeForm)}>X</h4>
                         </div>
                         <form className="form-horizontal style-form" id="post-form" data-type={state.route}>
                             <div className="form-group">
@@ -74,7 +128,7 @@ export class Form extends Component<any, any> {
                             <div className="form-group">
                                 <label className="col-sm-2 col-sm-2 control-label">
                                     Content
-                                    <input type="file" id="uploadImage" style={{ display: 'none' }} onChange={this.formService.handleImageSelection} />
+                                    <input type="file" id="post-image" style={{ display: 'none' }} onChange={linkEvent(this, imageSelectionForPostBody)} />
                                     <div class="content-upload-btn form-acc">
                                         <i className="fa fa-file-image-o"></i>
                                     </div>
@@ -86,7 +140,7 @@ export class Form extends Component<any, any> {
                             <div className="form-group">
                                 <label className="col-sm-2 col-sm-2 control-label">Cover Photo</label>
                                 <div className="col-sm-10">
-                                    <input type="file" className="form-control" name="file" id="file" onChange={linkEvent(this, imageSelection)} />
+                                    <input type="file" className="form-control" id="cover-image" onChange={linkEvent(this, imageSelectionForCover)} />
                                     <img src="" alt="Image preview..." id="file-preview" name="file-preview" />
                                 </div>
                             </div>
@@ -111,6 +165,6 @@ export class Form extends Component<any, any> {
                     </span>
                 </div>
             </div>
-            );
+        );
 	}
 }

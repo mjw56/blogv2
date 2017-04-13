@@ -2,7 +2,6 @@ import Component from 'inferno-component';
 import createElement from 'inferno-create-element';
 import { linkEvent } from 'inferno';
 import { Posts } from './Posts';
-import { AppService } from '../services/App';
 
 // handle click to fork repo
 function forkRepo() {
@@ -17,17 +16,13 @@ function forkRepo() {
 
 // handle click of create new post
 function createPost({ context }) {
-    context.store.updateState({ route: 'new-post' });
+    context.store.updateState({ route: 'post' });
 }
 
 // Home Screen with Auth
 export class Home extends Component<any, any> {
 	constructor(props, context?: any) {
 		super(props, context);
-        this.state = {
-            hasBaseRepo: false,
-            hasFetched: false
-        }
 	}
 
     componentDidMount() {
@@ -38,28 +33,23 @@ export class Home extends Component<any, any> {
       // will create the fork and allow user to start creating posts!
       this.context.api.getRepo('fuusio')
         .then(res => {
-            this.setState({
-                hasFetched: true,
-                hasBaseRepo: (res && res.message !== 'Not Found') ? true : false,
-            });
+                this.context.store.updateState({
+                    appInit: true,
+                    hasBaseRepo: (res && res.message !== 'Not Found') ? true : false,
+                });
         });
     }
 
 	render() {
-        const { hasFetched, hasBaseRepo } = this.state
+        const { appInit, hasBaseRepo } = this.context.store.getState();
         return (
             <div className="col-lg-12" id="index">
                 {
-                    hasFetched ? 
-                        hasBaseRepo
+                    appInit ? 
+                        !hasBaseRepo
                             ? (
-                                <a className="ghost-btn purple" onClick={linkEvent(this, createPost)}>
-                                <span>Create New Post</span>
-                                </a>
-                            )
-                            : (
                                 <div>
-                                    <span className="title">Welcome Home</span><br />
+                                    <span className="title">Welcome Home</span><br /><br />
                                     First things first! We'll need to fork the base blog repo over to your account.<br />
                                     From there, all new posts you create will live under this newly forked repo.
                                     <br /><br />
@@ -68,6 +58,7 @@ export class Home extends Component<any, any> {
                                     </a>
                                 </div>
                             )
+                            : <Posts />
                     : null
                 }
 

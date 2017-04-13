@@ -14,7 +14,6 @@ import { Form } from './components/Form';
 import { API } from './services/Api';
 import { createStore } from './services/Store';
 import { AppService } from './services/App';
-import { RouterService } from './services/Router';
 
 // see if there is an access token sitting
 // in cookies. if so, fetch the users deets
@@ -27,23 +26,23 @@ AppService.init().then((config) => {
         auth,
         user: api.getUser(),
         route: auth ? 'index' : 'login',
-        posts: []
+        posts: [],
+        postToEdit: '',
+        appInit: false,
+        hasBaseRepo: false
     };
 
     // init store
     let store = createStore(initialState);
 
-    // init router
-    const router = RouterService(store);
-
     // render fn
     function renderApp() {
         render(
-            <Provider api={api} store={store} router={router}>
+            <Provider api={api} store={store}>
                 <App AppService={AppService}>
                     <Route path="login" component={Login} />
                     <AuthRoute path="index" component={Home} />
-                    <AuthRoute path="new-post" component={Form} />
+                    <AuthRoute path="post" component={Form} />
                 </App>
             </Provider>,
             document.getElementById("root")

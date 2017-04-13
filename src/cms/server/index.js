@@ -53,11 +53,20 @@ app.get('/sign-s3', function(req, res) {
     });
 });
 
+app.post('/add-image', function(req, res) {
+    const { name, content, token, owner } = req.body;
+
+    createFile(owner, 'fuusio', `media/${name}`, `add ${name}`, content, token)
+        .then(response => {
+            res.end();
+        });
+});
+
 // save post to GitHub
 app.post('/save-post', function(req, res) {
     // when saving post we'll first need to get
     // the config file which will be updated
-    const { user, deets, token } = req.body;
+    const { cover, user, deets, token } = req.body;
 
     let promises = [];
 
@@ -72,6 +81,87 @@ app.post('/save-post', function(req, res) {
             
             // create the slug that will be the identifier
             const slug = `${getDateNow()}-${deets.title.replace(/[^a-zA-Z ]/g, "").toLowerCase().split(' ').join('-')}`;
+
+            // update config for the new slug with deets
+            config.posts[slug] = { title: deets.title, slug: slug, cover };
+
+            // get list of slugs, and for each one construct title/route
+            const postKeys = Object.keys(config.posts).sort().reverse();
+            const postsForIndex = postKeys.map(slug => ({ 
+                title: config.posts[slug].title,
+                route: `posts/${slug}/index.html`
+            }));
+
+            // construct post html file
+            const postHTML = getHTMLFor(
+                path.join( __dirname, '_post.html'),
+                {
+                    author: user.name,
+                    title: deets.title,
+                    body: converter.makeHtml(deets.content)
+                }
+            );
+
+            // construct post html file
+            const indexHTML = getHTMLFor(
+                path.join( __dirname, '_index.html'),
+                {
+                    author: user.name,
+                    title: config.title,
+                    posts: postsForIndex
+                }
+            );
+
+            const api = multiFileCommit({
+                username: user.login,
+                token,
+                reponame: 'fuusio'
+            });
+
+            api.commit(
+                [
+                    {
+                        path: `drafts/${slug}/index.md`,
+                        content: JSON.stringify(deets.content)
+                    }, {
+                        path: `posts/${slug}/index.html`,
+                        content: postHTML
+                    },
+                    {
+                        path: 'index.html',
+                        content: indexHTML
+                    }, {
+                        path: 'config.json',
+                        content: JSON.stringify(config,  null, "\t")
+                    },
+                ], 
+                'test commit via api'
+            )
+            .then(_ => res.end())
+            .catch(e => console.log('Failed to save new post', e));
+        } catch (e) {
+            console.error('Failed to save new post', e);
+        }
+    });
+});
+
+// saves post into mLab
+app.post('/update-post', function(req, res) {
+    const { user, deets, token, post } = req.body;
+
+    let promises = [];
+
+    Promise.all([
+        getFile(user.login, 'fuusio', 'config.json'),
+        getFile(user.login, 'fuusio', 'index.html')
+    ])
+    .then(([configFile, indexFile]) => {
+        try {
+            // decode the config file from base 64
+            const config = JSON.parse(new Buffer(configFile.content, 'base64').toString());
+            
+            // create the slug that will be the identifier
+            const slug = post.slug;
 
             // update config for the new slug with deets
             config.posts[slug] = { title: deets.title, slug: slug };
@@ -126,30 +216,14 @@ app.post('/save-post', function(req, res) {
                         content: JSON.stringify(config,  null, "\t")
                     },
                 ], 
-                'test commit via api'
-            ).then(_ => {
-                console.log('success!');
-                res.end();
-            });
+                `update ${slug}`
+            )
+            .then(_ => res.end())
+            .catch(e => console.log('Failed to update the post', e));
         } catch (e) {
-            console.error('Failed to save new post', e);
+            console.error('Failed to update the post', e);
         }
     });
-});
-
-// saves post into mLab
-app.post('/update-post', function(req, res) {
-    database.updatePost(
-        req.body, 
-        Date.now(), 
-        function(posts) {
-            console.log('update success!', posts);
-            res.json(true);
-        },
-        function(err) {
-            console.log(`Error updating to Mongo ${err}`);
-        }
-    );
 });
 
 // delete post from mLab
