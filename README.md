@@ -18,5 +18,5 @@ open your browser to `localhost:3000`
 
 ## TODO
 
-- [ ] Theming
-- [ ] Deployment hook 
+- [X] Theming
+- [X] Deployment hook 
