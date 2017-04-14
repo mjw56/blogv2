@@ -3,9 +3,9 @@ import { linkEvent } from "inferno";
 import { Avatar } from "./Avatar";
 import { AppService } from "../services/App";
 
-// handle click of create new post
-function createPost({ store }) {
-  store.updateState({ route: "post" });
+// follow 
+function goTo({ store, route }) {
+  store.updateState({ route });
 }
 
 // Auth Header
@@ -17,9 +17,11 @@ export const HeaderAuth = ({ avatar, className }, { api, store }) => {
         <Avatar avatar={avatar} />
         <ul className="sub-menu">
           {appInit && hasBaseRepo
-            ? <li onClick={linkEvent({ store }, createPost)}>New Post</li>
+            ? <li onClick={linkEvent({ store, route: 'post' }, goTo)}>New Post</li>
             : null}
-          <li onClick={linkEvent({ api, store }, AppService.logout)}>Logout</li>
+          <li onClick={linkEvent({ store, route: 'settings' }, goTo)}>Settings</li>
+          <li onClick={linkEvent({ store, route: 'deploy' }, goTo)}>Deploy</li>
+          <li onClick={linkEvent({ store }, AppService.logout)}>Logout</li>
         </ul>
       </div>
     </div>

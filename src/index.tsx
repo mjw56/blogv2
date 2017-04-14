@@ -9,6 +9,8 @@ import { App } from "./components/App";
 import { Login } from "./components/Login";
 import { Home } from "./components/Home";
 import { Form } from "./components/Form";
+import { Settings } from "./components/Settings";
+import { Deploy } from "./components/Deploy";
 
 // services
 import { API } from "./services/Api";
@@ -44,6 +46,8 @@ AppService.init()
             <Route path="login" component={Login} />
             <AuthRoute path="index" component={Home} />
             <AuthRoute path="post" component={Form} />
+            <AuthRoute path="settings" component={Settings} />
+            <AuthRoute path="deploy" component={Deploy} />
           </App>
         </Provider>,
         document.getElementById("root")
