@@ -92,6 +92,10 @@ label[for=login-cbx] {
   display: flex;
 }
 
+.posts-list h1 {
+  font-weight: 100;
+}
+
 .posts-list li {
   list-style: none;
   font-size: 20px;
@@ -137,9 +141,14 @@ label[for=login-cbx] {
   margin: 15px 0;
 }
 
-.form-panel input, .form-panel textarea {
+.form-panel input, .form-panel textarea, .form-panel select {
   background: transparent;
   color: white;
+}
+
+.form-panel select {
+  float: left;
+  height: 30px;
 }
 
 .form-panel label {
@@ -166,6 +175,51 @@ label[for=login-cbx] {
 
 .content {
   margin: 25px 0 0 0;
+}
+
+.content.settings, .content.deploy {
+  margin: 100px 0 0 0;
+}
+
+.content.settings form {
+  text-align: center;
+}
+
+.content.settings form .ghost-btn,
+.content.deploy .ghost-btn {
+  margin-right: 15px;
+}
+
+.content.deploy {
+  text-align: center;
+}
+
+.content.deploy h1 {
+  font-weight: 100;
+}
+
+.content.deploy input {
+    width: 50%;
+    border-radius: 5px;
+    border: 1px solid white;
+    height: 40px;
+    padding: 15px;
+    font-size: 22px;
+}
+
+.content.deploy a {
+  text-decoration: none;
+  color: white;
+}
+
+.content.deploy i {
+  margin-left: 15px;
+  font-size: 24px;
+}
+
+.content.deploy i:hover {
+  cursor: pointer;
+  opacity: 0.85;
 }
 
 .ghost-btn {
@@ -342,3 +396,6 @@ label[for=login-cbx] {
 .fa-file-image-o:before{content:"\f1c5"}
 .fa-edit:before,.fa-pencil-square-o:before{content:"\f044"}
 .fa-github:before{content:"\f09b"}
+.fa-envelope-open-o:before {
+  content: "\f2b7";
+}
