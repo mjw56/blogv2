@@ -3,6 +3,7 @@ import { GitHubAPI } from "./GitHub";
 interface APIInterface {
   hasToken(): boolean,
   getToken(): string
+  post(route: string, data: Object): Promise<any>;
 }
 
 /**
@@ -20,7 +21,7 @@ export class API extends GitHubAPI implements APIInterface {
   }
 
   // check if token is present
-  hasToken(): boolean {
+  hasToken() {
     return typeof this.access_token === "string" && this.access_token !== "";
   }
 
