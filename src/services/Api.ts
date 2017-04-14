@@ -40,7 +40,7 @@ export class API extends GitHubAPI implements APIInterface {
         body: JSON.stringify(data)
       }).then(res => {
         if (res && res.status === 200) {
-          resolve();
+          resolve(res);
         } else {
           reject("POST CONTENT SAVE FAILURE");
         }
