@@ -1,3 +1,4 @@
+const exec = require('child_process').exec;
 const express = require("express");
 const http = require("http");
 const https = require("https");
@@ -182,7 +183,7 @@ app.post("/update-post", function(req, res) {
       const postKeys = Object.keys(config.posts).sort().reverse();
       const postsForIndex = postKeys.map(slug => ({
         title: config.posts[slug].title,
-        route: `_posts/${slug}/index.html`
+        route: `posts/${slug}/index.html`
       }));
 
       // construct post html file
@@ -232,6 +233,68 @@ app.post("/update-post", function(req, res) {
     } catch (e) {
       console.error("Failed to update the post", e);
     }
+  });
+});
+
+app.post("/save-config", function(req, res) {
+      const { config, user, token } = req.body;
+
+      // get list of slugs, and for each one construct title/route
+      const postKeys = Object.keys(config.posts).sort().reverse();
+      const postsForIndex = postKeys.map(slug => ({
+        title: config.posts[slug].title,
+        route: `posts/${slug}/index.html`
+      }));
+
+      // construct post html file
+      const indexHTML = getHTMLFor(path.join(__dirname, "_index.html"), {
+        author: user.name,
+        title: config.title,
+        posts: postsForIndex
+      });
+
+      const api = multiFileCommit({
+        username: user.login,
+        token,
+        reponame: "fuusio"
+      });
+
+      api
+        .commit(
+          [
+            {
+              path: "index.html",
+              content: indexHTML
+            },
+            {
+              path: "config.json",
+              content: JSON.stringify(config, null, "\t")
+            }
+          ],
+          `update config`
+        )
+        .then(_ => res.end())
+        .catch(e => console.log("Failed to update the config", e));
+});
+
+app.post("/deploy-site", function(req, res) {
+  const login = req.body.user;
+
+  exec(`now ${login}/fuusio --static`, (err, stdout, stderr) => {
+
+    if (err) {
+      console.log(err);
+    }
+
+    if (stderr) {
+      console.log(stderr);
+    }
+
+    console.log('success!', stdout);
+
+    const url = stdout.substr(stdout.indexOf('https'));
+
+    res.json({ url });
   });
 });
 
