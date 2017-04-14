@@ -36,7 +36,7 @@ export class Deploy extends Component<any, any> {
 
     return (
       <div className="col-lg-12 form-panel" id="settings">
-        <h1>This will deploy an instance of the static site</h1><br />
+        <h1>This will deploy an instance of the site to zeit servers.</h1><br />
         <input disabled value={this.state.url} />
         {this.state.url
           ? <a href={this.state.url} target="_blank" rel="noopener noreferrer">
