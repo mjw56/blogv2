@@ -37,13 +37,11 @@ function imageSelectionForPostBody(t) {
         const content = document.getElementById("content").value;
 
         if (content === "") {
-          document.getElementById(
-            "content"
-          ).value = `![${file.name}](../../media/${file.name})`;
+          document.getElementById("content")
+            .value = `![${file.name}](../../media/${file.name})`;
         } else {
-          document.getElementById(
-            "content"
-          ).value = `${content}\n\n![${file.name}](../../media/${file.name})`;
+          document.getElementById("content")
+            .value = `${content}\n\n![${file.name}](../../media/${file.name})`;
         }
       });
   });
@@ -100,9 +98,8 @@ export class Form extends Component<any, any> {
                 const parsedConfig = JSON.parse(atob(config.content));
                 const parsedPost = JSON.parse(atob(post.content));
 
-                document.getElementById("title").value = parsedConfig.posts[
-                  state.postToEdit.slug
-                ].title;
+                document.getElementById("title").value =
+                  parsedConfig.posts[state.postToEdit.slug].title;
                 document.getElementById("content").value = parsedPost;
               } catch (e) {
                 console.log(
@@ -112,7 +109,8 @@ export class Form extends Component<any, any> {
               }
             })
             .catch(e =>
-              console.log("failed to fetch details for post to edit"));
+              console.log("failed to fetch details for post to edit")
+            );
         }
       })
       .catch(e => console.log("failed to mount form"));

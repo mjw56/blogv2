@@ -3,7 +3,7 @@ import { linkEvent } from "inferno";
 import { Avatar } from "./Avatar";
 import { AppService } from "../services/App";
 
-// follow 
+// follow
 function goTo({ store, route }) {
   store.updateState({ route });
 }
@@ -17,10 +17,14 @@ export const HeaderAuth = ({ avatar, className }, { api, store }) => {
         <Avatar avatar={avatar} />
         <ul className="sub-menu">
           {appInit && hasBaseRepo
-            ? <li onClick={linkEvent({ store, route: 'post' }, goTo)}>New Post</li>
+            ? <li onClick={linkEvent({ store, route: "post" }, goTo)}>
+                New Post
+              </li>
             : null}
-          <li onClick={linkEvent({ store, route: 'settings' }, goTo)}>Settings</li>
-          <li onClick={linkEvent({ store, route: 'deploy' }, goTo)}>Deploy</li>
+          <li onClick={linkEvent({ store, route: "settings" }, goTo)}>
+            Settings
+          </li>
+          <li onClick={linkEvent({ store, route: "deploy" }, goTo)}>Deploy</li>
           <li onClick={linkEvent({ store }, AppService.logout)}>Logout</li>
         </ul>
       </div>

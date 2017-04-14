@@ -114,12 +114,9 @@ export function FormService() {
           document.getElementById("submit-btn").classList.remove("purple");
           document.getElementById("submit-btn").classList.add("green");
 
-          setTimeout(
-            function() {
-              resolve();
-            },
-            2500
-          );
+          setTimeout(function() {
+            resolve();
+          }, 2500);
         } else {
           reject("SAVE FAILURE");
         }
@@ -137,9 +134,8 @@ export function FormService() {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
-    const _id = document.getElementById("post-form").attributes[
-      "data-id"
-    ].nodeValue;
+    const _id = document.getElementById("post-form").attributes["data-id"]
+      .nodeValue;
     const post = state.posts.find(p => p._id === _id);
 
     const data = {
@@ -161,12 +157,9 @@ export function FormService() {
           document.getElementById("delete-btn").classList.remove("orange");
           document.getElementById("delete-btn").classList.add("green");
 
-          setTimeout(
-            function() {
-              store.updateState({ route: "index" });
-            },
-            2500
-          );
+          setTimeout(function() {
+            store.updateState({ route: "index" });
+          }, 2500);
         } else {
           console.log("DELETE FAILURE");
         }
