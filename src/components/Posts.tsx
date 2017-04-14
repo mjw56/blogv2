@@ -57,7 +57,7 @@ export class Posts extends Component<any, any> {
                     </li>
                   ))}
                 </ul>
-              : null
+              : <h1>No Posts Yet</h1>
           : null}
       </div>
     );
