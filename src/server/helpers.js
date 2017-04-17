@@ -24,11 +24,22 @@ function pad(n) {
 function getDateNow() {
   const date = new Date();
 
-  return `${date.getFullYear()}-${pad(date.getMonth())}-${pad(date.getDate())}`;
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+function getDateText(date) {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const d = new Date(date);
+  return `${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
 module.exports = {
   getHTMLFor,
   pad,
-  getDateNow
+  getDateNow,
+  getDateText
 };

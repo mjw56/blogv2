@@ -11,7 +11,7 @@ const {
   updateFile,
   multiFileCommit
 } = require("./github");
-const { getHTMLFor, getDateNow, pad } = require("./helpers");
+const { getHTMLFor, getDateNow, getDateText, pad } = require("./helpers");
 const showdown = require("showdown");
 const converter = new showdown.Converter();
 
@@ -111,7 +111,8 @@ app.post("/save-post", function(req, res) {
       const postHTML = getHTMLFor(path.join(__dirname, "_post.html"), {
         author: user.name,
         title: deets.title,
-        body: converter.makeHtml(deets.content)
+        body: converter.makeHtml(deets.content),
+        date: getDateText(slug.substr(0, 10))
       });
 
       // construct post html file

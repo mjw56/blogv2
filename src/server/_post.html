@@ -19,9 +19,12 @@
 
     <main role="main">
       <article role="article">
-        <h1>{{title}}</h1>
+        <section aria-live="assertive" aria-atomic="true" class="post-header">
+          <h1>{{title}}</h1>
+          <h6>{{date}}</h6>
+        </section>
 
-        <section aria-live="assertive" aria-atomic="true">
+        <section aria-live="assertive" aria-atomic="true" class="post-body">
           {{{body}}}
         </section>
       </article>
