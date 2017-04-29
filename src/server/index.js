@@ -102,9 +102,11 @@ app.post("/save-post", function(req, res) {
 
       // get list of slugs, and for each one construct title/route
       const postKeys = Object.keys(config.posts).sort().reverse();
-      const postsForIndex = postKeys.map(slug => ({
+      const postsForIndex = postKeys.map((slug, i) => ({
         title: config.posts[slug].title,
-        route: `posts/${slug}/index.html`
+        route: `posts/${slug}/index.html`,
+        commentIndex: i + 1,
+        slug
       }));
 
       // construct post html file
@@ -112,7 +114,9 @@ app.post("/save-post", function(req, res) {
         author: user.name,
         title: deets.title,
         body: converter.makeHtml(deets.content),
-        date: getDateText(slug.substr(0, 10))
+        date: getDateText(slug.substr(0, 10)),
+        pageURL: `https://blog.mikewilcox.im/posts/${slug}/index.html`,
+        pageIdentifier: postsForIndex.find(p => p.slug === slug).commentIndex
       });
 
       // construct post html file
@@ -182,16 +186,21 @@ app.post("/update-post", function(req, res) {
 
       // get list of slugs, and for each one construct title/route
       const postKeys = Object.keys(config.posts).sort().reverse();
-      const postsForIndex = postKeys.map(slug => ({
+      const postsForIndex = postKeys.map((slug, i) => ({
         title: config.posts[slug].title,
-        route: `posts/${slug}/index.html`
+        route: `posts/${slug}/index.html`,
+        commentIndex: i + 1,
+        slug
       }));
 
       // construct post html file
       const postHTML = getHTMLFor(path.join(__dirname, "_post.html"), {
         author: user.name,
         title: deets.title,
-        body: converter.makeHtml(deets.content)
+        body: converter.makeHtml(deets.content),
+        date: getDateText(slug.substr(0, 10)),
+        pageURL: `https://blog.mikewilcox.im/posts/${slug}/index.html`,
+        pageIdentifier: postsForIndex.find(p => p.slug === slug).commentIndex
       });
 
       // construct post html file
